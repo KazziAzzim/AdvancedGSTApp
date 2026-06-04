@@ -236,6 +236,7 @@ public class SalesInvoice : AuditableEntity
     public string? TermsAndConditions { get; set; }
     public string EInvoiceStatus { get; set; } = "Pending"; public string? IRNNumber { get; set; }
     public string? QRCode { get; set; }
+    public string? FinancialYear { get; set; }
     public string EWayBillStatus { get; set; } = "Pending"; public string? EWayBillNumber { get; set; }
     public List<SalesInvoiceItem> Items { get; set; } = [];
 }
