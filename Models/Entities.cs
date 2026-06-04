@@ -357,9 +357,15 @@ public class GstReconciliationItem : AuditableEntity
 }
 public class AuditLog : AuditableEntity
 {
-    public string ActionType { get; set; } = string.Empty; public string EntityName { get; set; } = string.Empty; public string EntityId { get; set; } = string.Empty; public string? OldValue { get; set; }
+    public string ActionType { get; set; } = string.Empty;
+    public string EntityName { get; set; } = string.Empty; 
+    public string EntityId { get; set; } = string.Empty; 
+    public string? OldValue { get; set; }
     public string? NewValue { get; set; }
     public string? UserId { get; set; }
+    public string? ModuleName { get; set; }
+    public string? Description { get; set; }
+    public string? IpAddress { get; set; }
 }
 public class AppSetting : AuditableEntity
 {
