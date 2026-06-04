@@ -32,7 +32,8 @@ public static class DbSeeder
             return;
         }
 
-        var migrations = await db.Database.GetMigrationsAsync();
+        var migrations = db.Database.GetMigrations();
+
         if (migrations.Any())
         {
             await db.Database.MigrateAsync();
