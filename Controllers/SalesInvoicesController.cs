@@ -1,3 +1,4 @@
+using AdvancedGSTApp.Filters;
 using AdvancedGSTApp.Data;
 using AdvancedGSTApp.Models;
 using AdvancedGSTApp.Services.Interfaces;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AdvancedGSTApp.Controllers;
 
 [Authorize]
+[PermissionAuthorize("Sales Invoice", "View")]
 public class SalesInvoicesController(
     ApplicationDbContext db,
     ISalesInvoiceService invoices,
@@ -17,6 +19,7 @@ public class SalesInvoicesController(
 {
     public async Task<IActionResult> Index() => View(await invoices.GetAllAsync());
 
+    [PermissionAuthorize("Sales Invoice", "Create")]
     public async Task<IActionResult> Create() => View("Edit", await BuildFormViewModelAsync(new SalesInvoice
     {
         InvoiceNumber = await invoices.GenerateNextInvoiceNumberAsync(),
@@ -25,6 +28,7 @@ public class SalesInvoicesController(
     }));
 
     [HttpPost, ValidateAntiForgeryToken]
+    [PermissionAuthorize("Sales Invoice", "Create")]
     public async Task<IActionResult> Create(SalesInvoiceFormViewModel model)
     {
         var invoice = model.Invoice;
@@ -46,11 +50,14 @@ public class SalesInvoicesController(
 
     public async Task<IActionResult> Details(int id) => View(await invoices.GetByIdAsync(id));
 
+    [PermissionAuthorize("Sales Invoice", "Print")]
     public async Task<IActionResult> Print(int id) => View("Details", await invoices.GetByIdAsync(id));
 
+    [PermissionAuthorize("Sales Invoice", "Export")]
     public async Task<IActionResult> DownloadPdf(int id) => File(await pdf.GenerateInvoicePdfAsync(id), "application/pdf", $"invoice-{id}.pdf");
 
     [HttpPost, ValidateAntiForgeryToken]
+    [PermissionAuthorize("E-Invoice", "Generate")]
     public async Task<IActionResult> GenerateEInvoice(int id)
     {
         var result = await einvoice.GenerateAsync(id);
@@ -59,6 +66,7 @@ public class SalesInvoicesController(
     }
 
     [HttpPost, ValidateAntiForgeryToken]
+    [PermissionAuthorize("E-Way Bill", "Generate")]
     public async Task<IActionResult> GenerateEWayBill(int id)
     {
         var result = await eway.GenerateAsync(id);
@@ -67,6 +75,7 @@ public class SalesInvoicesController(
     }
 
     [HttpPost, ValidateAntiForgeryToken]
+    [PermissionAuthorize("Sales Invoice", "Delete")]
     public async Task<IActionResult> Delete(int id)
     {
         await invoices.DeleteAsync(id);

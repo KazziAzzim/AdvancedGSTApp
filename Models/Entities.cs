@@ -6,11 +6,40 @@ namespace AdvancedGSTApp.Models;
 public class ApplicationUser : IdentityUser
 {
     [StringLength(150)] public string FullName { get; set; } = string.Empty;
+    [StringLength(300)] public string? ProfilePhoto { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+    public DateTime? LastLoginDate { get; set; }
 }
 
-public class ApplicationRole : IdentityRole { public string? Description { get; set; } }
+public class ApplicationRole : IdentityRole
+{
+    [StringLength(500)] public string? Description { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+}
+
+public class RolePermission
+{
+    public int Id { get; set; }
+    [Required] public string RoleId { get; set; } = string.Empty;
+    public ApplicationRole? Role { get; set; }
+    [Required, StringLength(120)] public string ModuleName { get; set; } = string.Empty;
+    public bool CanView { get; set; }
+    public bool CanCreate { get; set; }
+    public bool CanEdit { get; set; }
+    public bool CanDelete { get; set; }
+    public bool CanPrint { get; set; }
+    public bool CanExport { get; set; }
+    public bool CanEmail { get; set; }
+    public bool CanGenerate { get; set; }
+    public bool CanApprove { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+}
+
 
 public abstract class AuditableEntity
 {

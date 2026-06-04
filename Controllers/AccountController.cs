@@ -18,11 +18,24 @@ public class AccountController(SignInManager<ApplicationUser> signInManager, Use
             return View(model);
         }
 
-        var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, true);
-
-        if (result.Succeeded)
+        var user = await userManager.FindByEmailAsync(model.Email);
+        if (user is not null && !user.IsActive)
         {
-            return Redirect(returnUrl ?? Url.Action("Index", "Home")!);
+            ModelState.AddModelError(string.Empty, "Your account is inactive. Please contact administrator.");
+            return View(model);
+        }
+
+        if (user is not null)
+        {
+            var result = await signInManager.CheckPasswordSignInAsync(user, model.Password, true);
+
+            if (result.Succeeded)
+            {
+                await signInManager.SignInAsync(user, model.RememberMe);
+                user.LastLoginDate = DateTime.UtcNow;
+                await userManager.UpdateAsync(user);
+                return Redirect(returnUrl ?? Url.Action("Index", "Home")!);
+            }
         }
 
         ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -35,9 +48,6 @@ public class AccountController(SignInManager<ApplicationUser> signInManager, Use
         await signInManager.SignOutAsync();
         return RedirectToAction(nameof(Login));
     }
-
-    [Authorize(Roles = "Super Admin,Admin")]
-    public IActionResult CreateUser() => View();
 
     [Authorize]
     public IActionResult AccessDenied() => View();
