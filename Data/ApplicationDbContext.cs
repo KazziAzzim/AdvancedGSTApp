@@ -46,10 +46,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
-        foreach (var entityType in builder.Model.GetEntityTypes().Where(e => typeof(AuditableEntity).IsAssignableFrom(e.ClrType)))
+
+        foreach (var entityType in builder.Model.GetEntityTypes()
+        .Where(e =>
+        typeof(AuditableEntity).IsAssignableFrom(e.ClrType)
+        && e.BaseType == null
+        && !e.IsOwned()))
         {
-            builder.Entity(entityType.ClrType).HasQueryFilter(CreateSoftDeleteFilter(entityType.ClrType));
+            builder.Entity(entityType.ClrType)
+                .HasQueryFilter(CreateSoftDeleteFilter(entityType.ClrType));
         }
 
         foreach (var property in builder.Model.GetEntityTypes().SelectMany(t => t.GetProperties()).Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
