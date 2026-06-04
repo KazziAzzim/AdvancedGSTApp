@@ -1,0 +1,4 @@
+@model List<SaasPayment>
+@{ ViewData["Title"] = "SaaS Payments"; }
+<div class="page-header"><div><span class="eyebrow">Platform Billing</span><h1>SaaS Payments</h1></div><a class="btn btn-primary" asp-action="Create">Record Payment</a></div>
+<div class="card table-card"><table class="table"><thead><tr><th>Invoice</th><th>Tenant</th><th>Plan</th><th>Date</th><th>Amount</th><th>Mode</th><th>Status</th></tr></thead><tbody>@foreach(var p in Model){<tr><td>@p.InvoiceNumber</td><td>@p.Tenant?.BusinessName</td><td>@p.SubscriptionPlan?.PlanName</td><td>@p.PaymentDate.ToString("dd MMM yyyy")</td><td>@p.Amount</td><td>@p.PaymentMode</td><td><span class="badge bg-success">@p.PaymentStatus</span></td></tr>}</tbody></table></div>

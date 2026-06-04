@@ -1,0 +1,4 @@
+@model List<TenantSubscription>
+@{ ViewData["Title"] = "Tenant Subscriptions"; }
+<div class="page-header"><div><span class="eyebrow">Platform</span><h1>Tenant Subscriptions</h1></div><a class="btn btn-primary" asp-action="Create">Assign Plan</a></div>
+<div class="card table-card"><table class="table"><thead><tr><th>Tenant</th><th>Plan</th><th>Cycle</th><th>Amount</th><th>Status</th><th>Payment</th><th>Ends</th></tr></thead><tbody>@foreach(var s in Model){<tr><td>@s.Tenant?.BusinessName</td><td>@s.SubscriptionPlan?.PlanName</td><td>@s.BillingCycle</td><td>@s.Amount</td><td><span class="badge bg-info">@s.Status</span></td><td><span class="badge bg-success">@s.PaymentStatus</span></td><td>@s.EndDate.ToString("dd MMM yyyy")</td></tr>}</tbody></table></div>
