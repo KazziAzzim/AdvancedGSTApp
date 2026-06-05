@@ -27,15 +27,16 @@ public class SuperAdminDashboardController(ApplicationDbContext db) : Controller
             RecentTenantRegistrations = await tenants.OrderByDescending(x => x.CreatedDate).Take(5).ToListAsync(),
             ExpiringSubscriptions = await db.TenantSubscriptions.IgnoreQueryFilters().Include(x => x.Tenant).Include(x => x.SubscriptionPlan).Where(x => x.EndDate >= today && x.EndDate <= today.AddDays(30)).OrderBy(x => x.EndDate).Take(10).ToListAsync()
         };
-        model.TenantUsageSummary = await tenants.Take(10).Select(x => new TenantUsageViewModel
+        var topTenants = await tenants.Take(10).ToListAsync();
+        model.TenantUsageSummary = topTenants.Select(x => new TenantUsageViewModel
         {
             TenantId = x.Id,
             BusinessName = x.BusinessName,
             UsersUsed = db.Users.Count(u => u.TenantId == x.Id && u.IsActive),
             MaxUsers = x.SubscriptionPlan != null ? x.SubscriptionPlan.MaxUsers : 0,
-            InvoicesThisMonth = db.SalesInvoices.IgnoreQueryFilters().Count(i => i.TenantId == x.Id && i.InvoiceDate >= new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1)),
+            InvoicesThisMonth = db.SalesInvoices.IgnoreQueryFilters().Count(i => i.TenantId == x.Id && i.InvoiceDate >= startOfMonth),
             MaxInvoicesPerMonth = x.SubscriptionPlan != null ? x.SubscriptionPlan.MaxInvoicesPerMonth : 0
-        }).ToListAsync();
+        }).ToList();
         return View(model);
     }
 }

@@ -443,7 +443,7 @@ namespace AdvancedGSTApp.Migrations
                         column: x => x.TenantId,
                         principalTable: "Tenants",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -483,7 +483,7 @@ namespace AdvancedGSTApp.Migrations
                         column: x => x.TenantId,
                         principalTable: "Tenants",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
             // --------------------------------------------------------------------
             // Create default SaaS plan and default tenant before applying FK constraints.
@@ -905,7 +905,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetRoles_Tenants_TenantId",
@@ -929,7 +929,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_CompanyProfiles_Tenants_TenantId",
@@ -937,7 +937,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_CreditNotes_Tenants_TenantId",
@@ -945,7 +945,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Customers_Tenants_TenantId",
@@ -953,7 +953,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_DebitNotes_Tenants_TenantId",
@@ -961,7 +961,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_EInvoices_Tenants_TenantId",
@@ -969,7 +969,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_EWayBills_Tenants_TenantId",
@@ -977,7 +977,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Expenses_Tenants_TenantId",
@@ -985,7 +985,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstApiCredentials_Tenants_TenantId",
@@ -993,7 +993,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstApiRequestLogs_Tenants_TenantId",
@@ -1001,7 +1001,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstApiResponseLogs_Tenants_TenantId",
@@ -1009,7 +1009,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstChallans_Tenants_TenantId",
@@ -1017,7 +1017,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstLiabilityLedgers_Tenants_TenantId",
@@ -1025,7 +1025,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstPaymentLedgers_Tenants_TenantId",
@@ -1033,7 +1033,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstPayments_Tenants_TenantId",
@@ -1041,7 +1041,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstRates_Tenants_TenantId",
@@ -1049,7 +1049,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstReconciliationItems_Tenants_TenantId",
@@ -1057,7 +1057,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstReconciliations_Tenants_TenantId",
@@ -1065,7 +1065,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstReturnFilings_Tenants_TenantId",
@@ -1073,7 +1073,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_GstReturnStatuses_Tenants_TenantId",
@@ -1081,7 +1081,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_HsnSacCodes_Tenants_TenantId",
@@ -1089,7 +1089,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_InputTaxCreditLedgers_Tenants_TenantId",
@@ -1097,7 +1097,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_InvoiceSeries_Tenants_TenantId",
@@ -1105,7 +1105,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_OutputTaxLedgers_Tenants_TenantId",
@@ -1113,7 +1113,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Payments_Tenants_TenantId",
@@ -1121,7 +1121,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Products_Tenants_TenantId",
@@ -1129,7 +1129,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_PurchaseInvoiceItems_Tenants_TenantId",
@@ -1137,7 +1137,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_PurchaseInvoices_Tenants_TenantId",
@@ -1145,7 +1145,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Receipts_Tenants_TenantId",
@@ -1153,7 +1153,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_RolePermissions_Tenants_TenantId",
@@ -1168,7 +1168,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_SalesInvoices_Tenants_TenantId",
@@ -1176,7 +1176,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ServiceItems_Tenants_TenantId",
@@ -1184,7 +1184,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Suppliers_Tenants_TenantId",
@@ -1192,7 +1192,7 @@ END
                 column: "TenantId",
                 principalTable: "Tenants",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.NoAction);
         }
 
         /// <inheritdoc />

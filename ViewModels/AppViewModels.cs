@@ -137,7 +137,8 @@ public class TenantListViewModel
 public class CreateTenantViewModel
 {
     [Required, StringLength(200)] public string BusinessName { get; set; } = string.Empty;
-    [Required, RegularExpression(@"^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$")] public string GSTIN { get; set; } = string.Empty;
+    //[Required, RegularExpression(@"^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$")]
+    public string GSTIN { get; set; } = string.Empty;
     [Required, RegularExpression(@"^[A-Z]{5}[0-9]{4}[A-Z]$")] public string PANNumber { get; set; } = string.Empty;
     [Required, StringLength(150)] public string ContactPersonName { get; set; } = string.Empty;
     [Required, EmailAddress] public string Email { get; set; } = string.Empty;

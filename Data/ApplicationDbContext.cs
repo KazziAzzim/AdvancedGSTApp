@@ -64,10 +64,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     {
         base.OnModelCreating(builder);
 
-        foreach (var entityType in builder.Model.GetEntityTypes().Where(e => typeof(ITenantEntity).IsAssignableFrom(e.ClrType) && e.BaseType == null && !e.IsOwned()))
+        foreach (var entityType in builder.Model.GetEntityTypes()
+            .Where(e => typeof(ITenantEntity).IsAssignableFrom(e.ClrType) && e.BaseType == null && !e.IsOwned()))
         {
             builder.Entity(entityType.ClrType).HasQueryFilter(CreateTenantFilter(entityType.ClrType));
             builder.Entity(entityType.ClrType).HasIndex(nameof(ITenantEntity.TenantId));
+
+            builder.Entity(entityType.ClrType)
+                .HasOne(typeof(Tenant), nameof(TenantEntity.Tenant))
+                .WithMany()
+                .HasForeignKey(nameof(ITenantEntity.TenantId))
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
         foreach (var property in builder.Model.GetEntityTypes().SelectMany(t => t.GetProperties()).Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))

@@ -54,10 +54,10 @@ public class RolePermission
 }
 
 
-public interface ITenantEntity
-{
-    int TenantId { get; set; }
-}
+//public interface ITenantEntity
+//{
+//    int TenantId { get; set; }
+//}
 
 public abstract class TenantEntity : ITenantEntity
 {
