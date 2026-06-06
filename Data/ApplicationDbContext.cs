@@ -41,6 +41,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<GstReconciliation> GstReconciliations => Set<GstReconciliation>();
     public DbSet<GstReconciliationItem> GstReconciliationItems => Set<GstReconciliationItem>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<AppSetting> AppSettings => Set<AppSetting>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -63,6 +64,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         }
         builder.Entity<SalesInvoice>().HasMany(x => x.Items).WithOne(x => x.SalesInvoice).HasForeignKey(x => x.SalesInvoiceId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<PurchaseInvoice>().HasMany(x => x.Items).WithOne(x => x.PurchaseInvoice).HasForeignKey(x => x.PurchaseInvoiceId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<RolePermission>().HasIndex(x => new { x.RoleId, x.ModuleName }).IsUnique();
+        builder.Entity<RolePermission>().HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId).OnDelete(DeleteBehavior.Cascade);
     }
 
     private static System.Linq.Expressions.LambdaExpression CreateSoftDeleteFilter(Type entityType)

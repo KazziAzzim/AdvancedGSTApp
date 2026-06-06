@@ -1,3 +1,4 @@
+using AdvancedGSTApp.Filters;
 using AdvancedGSTApp.Models;
 using AdvancedGSTApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AdvancedGSTApp.Controllers;
 
 [Authorize(Roles = "Super Admin,Admin,Accountant")]
+[PermissionAuthorize("GST Payable Summary", "View")]
 public class GstController(
     IGstReportService reports,
     IGstReturnService returns,

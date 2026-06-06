@@ -1,4 +1,5 @@
 using AdvancedGSTApp.Models;
+using AdvancedGSTApp.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,7 @@ public static class DbSeeder
 
         await SeedRolesAsync(roleManager);
         await SeedSuperAdminAsync(userManager);
+        await SeedRolePermissionsAsync(db, roleManager);
         await SeedMasterDataAsync(db);
     }
 
@@ -54,7 +56,8 @@ public static class DbSeeder
             new ApplicationRole { Name = SuperAdminRole, Description = "Full access to all application modules and settings." },
             new ApplicationRole { Name = "Admin", Description = "Administrative access to master data and transactions." },
             new ApplicationRole { Name = "Accountant", Description = "Accounting, GST return, invoice, and report access." },
-            new ApplicationRole { Name = "Staff", Description = "Limited day-to-day operational access." }
+            new ApplicationRole { Name = "Staff", Description = "Limited day-to-day operational access." },
+            new ApplicationRole { Name = "Viewer", Description = "Read-only dashboard and reporting access." }
         };
 
         foreach (var role in roles)
@@ -90,6 +93,79 @@ public static class DbSeeder
         {
             await ThrowIfFailedAsync(userManager.AddToRoleAsync(admin, SuperAdminRole), $"assign '{SuperAdminRole}' role to '{DefaultAdminEmail}'");
         }
+    }
+
+
+    private static async Task SeedRolePermissionsAsync(ApplicationDbContext db, RoleManager<ApplicationRole> roleManager)
+    {
+        var roles = await roleManager.Roles.ToListAsync();
+        foreach (var role in roles)
+        {
+            foreach (var module in PermissionCatalog.Modules)
+            {
+                var permission = await db.RolePermissions.FirstOrDefaultAsync(p => p.RoleId == role.Id && p.ModuleName == module);
+                if (permission is null)
+                {
+                    permission = new RolePermission { RoleId = role.Id, ModuleName = module };
+                    ApplyDefaultPermission(role.Name ?? string.Empty, permission);
+                    db.RolePermissions.Add(permission);
+                }
+            }
+        }
+
+        await db.SaveChangesAsync();
+    }
+
+    private static void ApplyDefaultPermission(string roleName, RolePermission permission)
+    {
+        var allBusinessModules = PermissionCatalog.Modules.Except(["User Management", "Role Management", "GST API Credentials"]).ToHashSet();
+        var accountantModules = new HashSet<string>(["Dashboard", "Customers", "Suppliers", "Products", "Sales Invoice", "Purchase Invoice", "Credit Note", "Debit Note", "Expenses", "Receipts", "Payments", "GST Payable Summary", "Input Tax Credit", "Output Tax", "GST Challan", "GST Payment Tracking", "GSTR-1 Report", "GSTR-3B Report", "GST Return Filing", "GST Return Status", "GST Ledger", "GST Reconciliation", "Sales Register", "Purchase Register", "Expense Register", "Customer Statement", "Supplier Statement", "Reports"]);
+        var staffModules = new HashSet<string>(["Dashboard", "Customers", "Suppliers", "Products", "Sales Invoice"]);
+        var viewerModules = new HashSet<string>(["Dashboard", "Reports", "Sales Register", "Purchase Register", "GSTR-1 Report", "GSTR-3B Report"]);
+
+        switch (roleName)
+        {
+            case PermissionCatalog.SuperAdminRole:
+                SetAll(permission, true);
+                break;
+            case "Admin":
+                SetAll(permission, allBusinessModules.Contains(permission.ModuleName));
+                if (permission.ModuleName is "User Management" or "Role Management")
+                {
+                    permission.CanView = true;
+                    permission.CanCreate = true;
+                    permission.CanEdit = true;
+                    permission.CanDelete = false;
+                }
+                break;
+            case "Accountant":
+                SetAll(permission, accountantModules.Contains(permission.ModuleName));
+                permission.CanDelete = false;
+                break;
+            case "Staff":
+                permission.CanView = staffModules.Contains(permission.ModuleName);
+                permission.CanCreate = permission.ModuleName is "Customers" or "Suppliers" or "Products" or "Sales Invoice";
+                permission.CanEdit = permission.CanCreate;
+                permission.CanDelete = false;
+                break;
+            case "Viewer":
+                permission.CanView = viewerModules.Contains(permission.ModuleName);
+                permission.CanCreate = permission.CanEdit = permission.CanDelete = permission.CanPrint = permission.CanExport = permission.CanEmail = permission.CanGenerate = permission.CanApprove = false;
+                break;
+        }
+    }
+
+    private static void SetAll(RolePermission permission, bool value)
+    {
+        permission.CanView = value;
+        permission.CanCreate = value;
+        permission.CanEdit = value;
+        permission.CanDelete = value;
+        permission.CanPrint = value;
+        permission.CanExport = value;
+        permission.CanEmail = value;
+        permission.CanGenerate = value;
+        permission.CanApprove = value;
     }
 
     private static async Task SeedMasterDataAsync(ApplicationDbContext db)

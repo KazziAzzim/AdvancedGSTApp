@@ -1,3 +1,4 @@
+using AdvancedGSTApp.Filters;
 using AdvancedGSTApp.Models;
 using AdvancedGSTApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -6,17 +7,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace AdvancedGSTApp.Controllers;
 
 [Authorize]
+[PermissionAuthorize("Customers", "View")]
 public class CustomersController(ICustomerService service, IGstApiService gstApi) : Controller
 {
     public async Task<IActionResult> Index() => View(await service.GetAllAsync());
 
     public async Task<IActionResult> Details(int id) => View(await service.GetByIdAsync(id));
 
+    [PermissionAuthorize("Customers", "Create")]
     public IActionResult Create() => View("Edit", new Customer());
 
+    [PermissionAuthorize("Customers", "Edit")]
     public async Task<IActionResult> Edit(int id) => View(await service.GetByIdAsync(id));
 
     [HttpPost, ValidateAntiForgeryToken]
+    [PermissionAuthorize("Customers", "Edit")]
     public async Task<IActionResult> Edit(Customer model)
     {
         if (!ModelState.IsValid)
@@ -30,6 +35,7 @@ public class CustomersController(ICustomerService service, IGstApiService gstApi
     }
 
     [HttpPost, ValidateAntiForgeryToken]
+    [PermissionAuthorize("Customers", "Delete")]
     public async Task<IActionResult> Delete(int id)
     {
         await service.DeleteAsync(id);
