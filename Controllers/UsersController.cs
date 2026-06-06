@@ -2,6 +2,7 @@ using AdvancedGSTApp.Data;
 using AdvancedGSTApp.Filters;
 using AdvancedGSTApp.Models;
 using AdvancedGSTApp.Services;
+using AdvancedGSTApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,9 @@ namespace AdvancedGSTApp.Controllers;
 public class UsersController(
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
-    ApplicationDbContext db) : Controller
+    ApplicationDbContext db,
+    ITenantContext tenantContext,
+    ISubscriptionService subscriptionService) : Controller
 {
     private const int PageSize = 10;
 
@@ -24,6 +27,10 @@ public class UsersController(
     {
         page = Math.Max(1, page);
         var query = userManager.Users.AsQueryable();
+        if (!tenantContext.IsSuperAdmin && tenantContext.TenantId.HasValue)
+        {
+            query = query.Where(u => u.TenantId == tenantContext.TenantId.Value && !u.IsPlatformUser);
+        }
         if (!string.IsNullOrWhiteSpace(search))
         {
             var term = search.Trim();
@@ -83,9 +90,16 @@ public class UsersController(
         }
 
         var role = await roleManager.FindByIdAsync(model.RoleId);
-        if (role is null || !role.IsActive)
+        if (role is null || !role.IsActive || (!tenantContext.IsSuperAdmin && role.IsPlatformRole))
         {
-            ModelState.AddModelError(nameof(model.RoleId), "Select an active role.");
+            ModelState.AddModelError(nameof(model.RoleId), "Select an active tenant role.");
+            model.Roles = await BuildRoleSelectListAsync(model.RoleId);
+            return View(model);
+        }
+
+        if (!tenantContext.IsSuperAdmin && tenantContext.TenantId.HasValue && !await subscriptionService.CanCreateUserAsync(tenantContext.TenantId.Value))
+        {
+            ModelState.AddModelError(string.Empty, "Your subscription user limit has been reached.");
             model.Roles = await BuildRoleSelectListAsync(model.RoleId);
             return View(model);
         }
@@ -99,7 +113,9 @@ public class UsersController(
             ProfilePhoto = model.ProfilePhoto,
             IsActive = model.IsActive,
             EmailConfirmed = true,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+            TenantId = tenantContext.IsSuperAdmin && role.IsPlatformRole ? null : tenantContext.TenantId,
+            IsPlatformUser = tenantContext.IsSuperAdmin && role.IsPlatformRole
         };
         var result = await userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
@@ -160,7 +176,7 @@ public class UsersController(
 
         var oldRoles = await userManager.GetRolesAsync(user);
         var role = await roleManager.FindByIdAsync(model.RoleId);
-        if (role is null || !role.IsActive)
+        if (role is null || !role.IsActive || (!tenantContext.IsSuperAdmin && role.IsPlatformRole))
         {
             ModelState.AddModelError(nameof(model.RoleId), "Select an active role.");
             model.Roles = await BuildRoleSelectListAsync(model.RoleId);
@@ -251,8 +267,8 @@ public class UsersController(
         return RedirectToAction(nameof(Index));
     }
 
-    private Task<ApplicationUser?> FindUserAsync(string id) => userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
-    private async Task<List<SelectListItem>> BuildRoleSelectListAsync(string? selected = null) => await roleManager.Roles.Where(r => r.IsActive).OrderBy(r => r.Name).Select(r => new SelectListItem(r.Name, r.Id, r.Id == selected)).ToListAsync();
+    private Task<ApplicationUser?> FindUserAsync(string id) => userManager.Users.FirstOrDefaultAsync(u => u.Id == id && (tenantContext.IsSuperAdmin || (tenantContext.TenantId.HasValue && u.TenantId == tenantContext.TenantId.Value)));
+    private async Task<List<SelectListItem>> BuildRoleSelectListAsync(string? selected = null) => await roleManager.Roles.Where(r => r.IsActive && (tenantContext.IsSuperAdmin || !r.IsPlatformRole)).OrderBy(r => r.Name).Select(r => new SelectListItem(r.Name, r.Id, r.Id == selected)).ToListAsync();
     private async Task ValidateUniqueUserAsync(string email, string userName, string? currentId = null)
     {
         if (await userManager.Users.AnyAsync(u => u.Id != currentId && u.NormalizedEmail == email.ToUpper())) ModelState.AddModelError(nameof(CreateUserViewModel.Email), "Email already exists.");

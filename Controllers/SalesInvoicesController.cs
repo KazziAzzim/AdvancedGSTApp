@@ -15,7 +15,9 @@ public class SalesInvoicesController(
     ISalesInvoiceService invoices,
     IEInvoiceService einvoice,
     IEWayBillService eway,
-    IPdfService pdf) : Controller
+    IPdfService pdf,
+    ITenantContext tenantContext,
+    ISubscriptionService subscriptionService) : Controller
 {
     public async Task<IActionResult> Index() => View(await invoices.GetAllAsync());
 
@@ -32,6 +34,11 @@ public class SalesInvoicesController(
     public async Task<IActionResult> Create(SalesInvoiceFormViewModel model)
     {
         var invoice = model.Invoice;
+
+        if (tenantContext.TenantId.HasValue && !await subscriptionService.CanCreateInvoiceAsync(tenantContext.TenantId.Value))
+        {
+            ModelState.AddModelError(string.Empty, "Your monthly invoice limit has been reached for the current subscription plan.");
+        }
 
         if (invoice.Items.Count == 0)
         {
@@ -60,6 +67,11 @@ public class SalesInvoicesController(
     [PermissionAuthorize("E-Invoice", "Generate")]
     public async Task<IActionResult> GenerateEInvoice(int id)
     {
+        if (tenantContext.TenantId.HasValue && !await subscriptionService.HasFeatureAsync(tenantContext.TenantId.Value, "e-invoice"))
+        {
+            TempData["Error"] = "Your subscription plan does not include e-invoice.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
         var result = await einvoice.GenerateAsync(id);
         TempData[result.Success ? "Success" : "Error"] = result.Message;
         return RedirectToAction(nameof(Details), new { id });
@@ -69,6 +81,11 @@ public class SalesInvoicesController(
     [PermissionAuthorize("E-Way Bill", "Generate")]
     public async Task<IActionResult> GenerateEWayBill(int id)
     {
+        if (tenantContext.TenantId.HasValue && !await subscriptionService.HasFeatureAsync(tenantContext.TenantId.Value, "e-way bill"))
+        {
+            TempData["Error"] = "Your subscription plan does not include e-way bill.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
         var result = await eway.GenerateAsync(id);
         TempData[result.Success ? "Success" : "Error"] = result.Message;
         return RedirectToAction(nameof(Details), new { id });
