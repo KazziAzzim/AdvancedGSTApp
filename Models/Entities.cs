@@ -6,11 +6,40 @@ namespace AdvancedGSTApp.Models;
 public class ApplicationUser : IdentityUser
 {
     [StringLength(150)] public string FullName { get; set; } = string.Empty;
+    [StringLength(300)] public string? ProfilePhoto { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+    public DateTime? LastLoginDate { get; set; }
 }
 
-public class ApplicationRole : IdentityRole { public string? Description { get; set; } }
+public class ApplicationRole : IdentityRole
+{
+    [StringLength(500)] public string? Description { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+}
+
+public class RolePermission
+{
+    public int Id { get; set; }
+    [Required] public string RoleId { get; set; } = string.Empty;
+    public ApplicationRole? Role { get; set; }
+    [Required, StringLength(120)] public string ModuleName { get; set; } = string.Empty;
+    public bool CanView { get; set; }
+    public bool CanCreate { get; set; }
+    public bool CanEdit { get; set; }
+    public bool CanDelete { get; set; }
+    public bool CanPrint { get; set; }
+    public bool CanExport { get; set; }
+    public bool CanEmail { get; set; }
+    public bool CanGenerate { get; set; }
+    public bool CanApprove { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+}
+
 
 public abstract class AuditableEntity
 {
@@ -116,7 +145,7 @@ public class GstApiRequestLog : AuditableEntity { public string ApiName { get; s
 public class GstApiResponseLog : AuditableEntity { public int? GstApiRequestLogId { get; set; } public string ApiName { get; set; } = string.Empty; public string? ResponseBody { get; set; } public int StatusCode { get; set; } public bool Success { get; set; } public string? ErrorMessage { get; set; } public DateTime CreatedAt { get; set; } = DateTime.UtcNow; public string? RelatedEntityType { get; set; } public int? RelatedEntityId { get; set; } }
 public class GstReconciliation : AuditableEntity { public string Type { get; set; } = "GSTR-2A"; public string Period { get; set; } = string.Empty; public string Status { get; set; } = "Uploaded"; public string? UploadFilePath { get; set; } public List<GstReconciliationItem> Items { get; set; } = []; }
 public class GstReconciliationItem : AuditableEntity { public int GstReconciliationId { get; set; } public string SupplierGSTIN { get; set; } = string.Empty; public string InvoiceNumber { get; set; } = string.Empty; public DateTime InvoiceDate { get; set; } public decimal InvoiceAmount { get; set; } public string MatchStatus { get; set; } = "Pending"; public string? Remarks { get; set; } }
-public class AuditLog : AuditableEntity { public string ActionType { get; set; } = string.Empty; public string EntityName { get; set; } = string.Empty; public string EntityId { get; set; } = string.Empty; public string? OldValue { get; set; } public string? NewValue { get; set; } public string? UserId { get; set; } }
+public class AuditLog : AuditableEntity { public string ActionType { get; set; } = string.Empty; public string EntityName { get; set; } = string.Empty; public string EntityId { get; set; } = string.Empty; public string? ModuleName { get; set; } public string? Description { get; set; } public string? IpAddress { get; set; } public string? OldValue { get; set; } public string? NewValue { get; set; } public string? UserId { get; set; } }
 public class AppSetting : AuditableEntity { public string Key { get; set; } = string.Empty; public string Value { get; set; } = string.Empty; public string? Description { get; set; } }
 public record GstApiOptions { public string Provider { get; init; } = "MockGSP"; public string BaseUrl { get; init; } = string.Empty; public string Environment { get; init; } = "Sandbox"; public bool UseMock { get; init; } = true; public int MaxRetries { get; init; } = 3; public int FailureRatePercent { get; init; } = 15; }
 public record GstApiResult(bool Success, string Message, string? ReferenceNumber = null, string? Payload = null, int StatusCode = 200, bool ManualFallbackAvailable = false);

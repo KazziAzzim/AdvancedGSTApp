@@ -1,3 +1,6 @@
+@using AdvancedGSTApp.Services.Interfaces
+@using System.Security.Claims
+@inject IPermissionService PermissionService
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
@@ -7,6 +10,9 @@
         var actionMatches = action == null || string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
         return controllerMatches && actionMatches ? "active" : string.Empty;
     }
+
+    var layoutUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    async Task<bool> CanViewMenu(string moduleName) => User.Identity?.IsAuthenticated == true && !string.IsNullOrWhiteSpace(layoutUserId) && await PermissionService.CanViewAsync(layoutUserId, moduleName);
 }
 <!doctype html>
 <html lang="en">
@@ -31,22 +37,26 @@
 
             <nav class="nav sidebar-nav flex-column">
                 <span class="nav-section">Workspace</span>
-                <a class="nav-link @IsActive("Home")" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-                <a class="nav-link @IsActive("Customers")" asp-controller="Customers" asp-action="Index"><i class="bi bi-people-fill"></i> Customers</a>
-                <a class="nav-link @IsActive("Suppliers")" asp-controller="Suppliers" asp-action="Index"><i class="bi bi-truck"></i> Suppliers</a>
-                <a class="nav-link @IsActive("Products")" asp-controller="Products" asp-action="Index"><i class="bi bi-box-seam-fill"></i> Products</a>
+                @if (await CanViewMenu("Dashboard")) { <a class="nav-link @IsActive("Home")" asp-controller="Home" asp-action="Index"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a> }
+                @if (await CanViewMenu("Customers")) { <a class="nav-link @IsActive("Customers")" asp-controller="Customers" asp-action="Index"><i class="bi bi-people-fill"></i> Customers</a> }
+                @if (await CanViewMenu("Suppliers")) { <a class="nav-link @IsActive("Suppliers")" asp-controller="Suppliers" asp-action="Index"><i class="bi bi-truck"></i> Suppliers</a> }
+                @if (await CanViewMenu("Products")) { <a class="nav-link @IsActive("Products")" asp-controller="Products" asp-action="Index"><i class="bi bi-box-seam-fill"></i> Products</a> }
 
                 <span class="nav-section">Transactions</span>
-                <a class="nav-link @IsActive("SalesInvoices")" asp-controller="SalesInvoices" asp-action="Index"><i class="bi bi-file-earmark-text-fill"></i> Sales Invoices</a>
-                <a class="nav-link @IsActive("PurchaseInvoices")" asp-controller="PurchaseInvoices" asp-action="Index"><i class="bi bi-bag-check-fill"></i> Purchases</a>
+                @if (await CanViewMenu("Sales Invoice")) { <a class="nav-link @IsActive("SalesInvoices")" asp-controller="SalesInvoices" asp-action="Index"><i class="bi bi-file-earmark-text-fill"></i> Sales Invoices</a> }
+                @if (await CanViewMenu("Purchase Invoice")) { <a class="nav-link @IsActive("PurchaseInvoices")" asp-controller="PurchaseInvoices" asp-action="Index"><i class="bi bi-bag-check-fill"></i> Purchases</a> }
 
                 <span class="nav-section">GST Compliance</span>
-                <a class="nav-link @IsActive("Gst", "PayableSummary")" asp-controller="Gst" asp-action="PayableSummary"><i class="bi bi-cash-coin"></i> GST Payable</a>
-                <a class="nav-link @IsActive("Gst", "Gstr1")" asp-controller="Gst" asp-action="Gstr1"><i class="bi bi-journal-check"></i> GSTR-1</a>
-                <a class="nav-link @IsActive("Gst", "Gstr3B")" asp-controller="Gst" asp-action="Gstr3B"><i class="bi bi-clipboard2-data-fill"></i> GSTR-3B</a>
-                <a class="nav-link @IsActive("Gst", "Challan")" asp-controller="Gst" asp-action="Challan"><i class="bi bi-bank2"></i> Challan</a>
-                <a class="nav-link @IsActive("Gst", "ReturnStatus")" asp-controller="Gst" asp-action="ReturnStatus"><i class="bi bi-cloud-check-fill"></i> Return Status</a>
-                <a class="nav-link @IsActive("Reports")" asp-controller="Reports" asp-action="SalesRegister"><i class="bi bi-bar-chart-fill"></i> Reports</a>
+                @if (await CanViewMenu("GST Payable Summary")) { <a class="nav-link @IsActive("Gst", "PayableSummary")" asp-controller="Gst" asp-action="PayableSummary"><i class="bi bi-cash-coin"></i> GST Payable</a> }
+                @if (await CanViewMenu("GSTR-1 Report")) { <a class="nav-link @IsActive("Gst", "Gstr1")" asp-controller="Gst" asp-action="Gstr1"><i class="bi bi-journal-check"></i> GSTR-1</a> }
+                @if (await CanViewMenu("GSTR-3B Report")) { <a class="nav-link @IsActive("Gst", "Gstr3B")" asp-controller="Gst" asp-action="Gstr3B"><i class="bi bi-clipboard2-data-fill"></i> GSTR-3B</a> }
+                @if (await CanViewMenu("GST Challan")) { <a class="nav-link @IsActive("Gst", "Challan")" asp-controller="Gst" asp-action="Challan"><i class="bi bi-bank2"></i> Challan</a> }
+                @if (await CanViewMenu("GST Return Status")) { <a class="nav-link @IsActive("Gst", "ReturnStatus")" asp-controller="Gst" asp-action="ReturnStatus"><i class="bi bi-cloud-check-fill"></i> Return Status</a> }
+                @if (await CanViewMenu("Reports")) { <a class="nav-link @IsActive("Reports")" asp-controller="Reports" asp-action="SalesRegister"><i class="bi bi-bar-chart-fill"></i> Reports</a> }
+
+                <span class="nav-section">Administration</span>
+                @if (await CanViewMenu("User Management")) { <a class="nav-link @IsActive("Users")" asp-controller="Users" asp-action="Index"><i class="bi bi-person-gear"></i> Users</a> }
+                @if (await CanViewMenu("Role Management")) { <a class="nav-link @IsActive("Roles")" asp-controller="Roles" asp-action="Index"><i class="bi bi-shield-lock"></i> Roles</a> }
             </nav>
         </aside>
 
