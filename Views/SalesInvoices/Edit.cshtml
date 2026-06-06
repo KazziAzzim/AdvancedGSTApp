@@ -1,3 +1,111 @@
 @model SalesInvoiceFormViewModel
-<h1>Sales Invoice</h1><form asp-action="Create" method="post" id="invoiceForm"><div class="row"><div class="col-md-3"><label>Invoice No</label><input asp-for="Invoice.InvoiceNumber" class="form-control" readonly/></div><div class="col-md-3"><label>Date</label><input asp-for="Invoice.InvoiceDate" type="date" class="form-control"/></div><div class="col-md-3"><label>Customer</label><select asp-for="Invoice.CustomerId" class="form-select" id="customer"><option value="">Select</option>@foreach(var c in Model.Customers){<option value="@c.Id" data-state="@c.State" data-billing="@c.BillingAddress" data-shipping="@c.ShippingAddress">@c.CustomerName</option>}</select></div><div class="col-md-3"><label>Place of supply</label><input asp-for="Invoice.PlaceOfSupply" class="form-control" id="placeOfSupply"/></div><div class="col-md-6 mt-2"><label>Billing</label><textarea asp-for="Invoice.BillingAddress" class="form-control" id="billing"></textarea></div><div class="col-md-6 mt-2"><label>Shipping</label><textarea asp-for="Invoice.ShippingAddress" class="form-control" id="shipping"></textarea></div></div><hr/><div class="table-responsive"><table class="table" id="invoiceItems" data-company-state="@Model.CompanyState"><thead><tr><th>Type</th><th>Item</th><th>Description</th><th>HSN/SAC</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Disc%</th><th>GST%</th><th>Total</th><th></th></tr></thead><tbody><tr class="item-row"><td><select name="Invoice.Items[0].ItemType" class="form-select item-type"><option>Product</option><option>Service</option></select></td><td><select class="form-select item-select"><option value="">Select</option>@foreach(var p in Model.Products){<option value="@p.Id" data-type="Product">@p.ProductName</option>}@foreach(var s in Model.Services){<option value="@s.Id" data-type="Service">@s.ServiceName</option>}</select></td><td><input name="Invoice.Items[0].Description" class="form-control desc"/></td><td><input name="Invoice.Items[0].HsnSac" class="form-control hsn"/></td><td><input name="Invoice.Items[0].Quantity" class="form-control qty" value="1"/></td><td><input name="Invoice.Items[0].Unit" class="form-control unit"/></td><td><input name="Invoice.Items[0].Rate" class="form-control rate" value="0"/></td><td><input name="Invoice.Items[0].DiscountPercentage" class="form-control disc" value="0"/></td><td><input name="Invoice.Items[0].GSTPercentage" class="form-control gst" value="18"/></td><td><input name="Invoice.Items[0].LineTotal" class="form-control line" readonly/></td><td><button type="button" class="btn btn-danger remove-row">×</button></td></tr></tbody></table></div><button type="button" class="btn btn-outline-primary" id="addRow">Add Row</button><div class="row mt-3 gst-summary"><div class="col"><label>Taxable</label><input asp-for="Invoice.TaxableAmount" class="form-control" id="taxable" readonly/></div><div class="col"><label>CGST</label><input asp-for="Invoice.CGSTAmount" class="form-control" id="cgst" readonly/></div><div class="col"><label>SGST</label><input asp-for="Invoice.SGSTAmount" class="form-control" id="sgst" readonly/></div><div class="col"><label>IGST</label><input asp-for="Invoice.IGSTAmount" class="form-control" id="igst" readonly/></div><div class="col"><label>Grand Total</label><input asp-for="Invoice.GrandTotal" class="form-control" id="grand" readonly/></div></div><button class="btn btn-success mt-3">Save Invoice</button></form>
-@section Scripts{<script src="~/js/invoice.js"></script>}
+@{
+    ViewData["Title"] = "Sales Invoice";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-kicker">Invoice builder</div>
+        <h1 class="page-title">Sales Invoice</h1>
+        <p class="page-subtitle">Create professional GST invoices with automatic CGST, SGST, and IGST summary calculations.</p>
+    </div>
+</div>
+
+<form asp-action="Create" method="post" id="invoiceForm">
+    <div class="section-card mb-4">
+        <h5 class="mb-3"><i class="bi bi-person-vcard text-primary"></i> Invoice & Customer Details</h5>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Invoice No</label>
+                <input asp-for="Invoice.InvoiceNumber" class="form-control" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date</label>
+                <input asp-for="Invoice.InvoiceDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Customer</label>
+                <select asp-for="Invoice.CustomerId" class="form-select" id="customer">
+                    <option value="">Select</option>
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <option value="@customer.Id" data-state="@customer.State" data-billing="@customer.BillingAddress" data-shipping="@customer.ShippingAddress">@customer.CustomerName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Place of supply</label>
+                <input asp-for="Invoice.PlaceOfSupply" class="form-control" id="placeOfSupply" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Billing</label>
+                <textarea asp-for="Invoice.BillingAddress" class="form-control" id="billing" rows="3"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Shipping</label>
+                <textarea asp-for="Invoice.ShippingAddress" class="form-control" id="shipping" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div>
+                <h5 class="mb-1"><i class="bi bi-list-check text-primary"></i> Invoice Items</h5>
+                <p class="text-muted mb-0">Add products or services while keeping GST calculations unchanged.</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary" id="addRow"><i class="bi bi-plus-circle"></i> Add Item</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-modern" id="invoiceItems" data-company-state="@Model.CompanyState">
+                <thead><tr><th>Type</th><th>Item</th><th>Description</th><th>HSN/SAC</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Disc%</th><th>GST%</th><th>Total</th><th></th></tr></thead>
+                <tbody>
+                    <tr class="item-row">
+                        <td><select name="Invoice.Items[0].ItemType" class="form-select item-type"><option>Product</option><option>Service</option></select></td>
+                        <td>
+                            <select class="form-select item-select">
+                                <option value="">Select</option>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <option value="@product.Id" data-type="Product">@product.ProductName</option>
+                                }
+                                @foreach (var service in Model.Services)
+                                {
+                                    <option value="@service.Id" data-type="Service">@service.ServiceName</option>
+                                }
+                            </select>
+                        </td>
+                        <td><input name="Invoice.Items[0].Description" class="form-control desc" /></td>
+                        <td><input name="Invoice.Items[0].HsnSac" class="form-control hsn" /></td>
+                        <td><input name="Invoice.Items[0].Quantity" class="form-control qty" value="1" /></td>
+                        <td><input name="Invoice.Items[0].Unit" class="form-control unit" /></td>
+                        <td><input name="Invoice.Items[0].Rate" class="form-control rate" value="0" /></td>
+                        <td><input name="Invoice.Items[0].DiscountPercentage" class="form-control disc" value="0" /></td>
+                        <td><input name="Invoice.Items[0].GSTPercentage" class="form-control gst" value="18" /></td>
+                        <td><input name="Invoice.Items[0].LineTotal" class="form-control line" readonly /></td>
+                        <td><button type="button" class="btn btn-outline-danger btn-sm remove-row"><i class="bi bi-x-lg"></i></button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-card gst-summary">
+        <h5 class="mb-3"><i class="bi bi-calculator text-primary"></i> GST Summary</h5>
+        <div class="row g-3">
+            <div class="col-md"><label class="form-label">Taxable</label><input asp-for="Invoice.TaxableAmount" class="form-control" id="taxable" readonly /></div>
+            <div class="col-md"><label class="form-label">CGST</label><input asp-for="Invoice.CGSTAmount" class="form-control" id="cgst" readonly /></div>
+            <div class="col-md"><label class="form-label">SGST</label><input asp-for="Invoice.SGSTAmount" class="form-control" id="sgst" readonly /></div>
+            <div class="col-md"><label class="form-label">IGST</label><input asp-for="Invoice.IGSTAmount" class="form-control" id="igst" readonly /></div>
+            <div class="col-md grand-total p-3 rounded-4"><label class="form-label">Grand Total</label><input asp-for="Invoice.GrandTotal" class="form-control" id="grand" readonly /></div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <button class="btn btn-success"><i class="bi bi-save"></i> Save Invoice</button>
+            <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-arrow-left"></i> Back</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/invoice.js" asp-append-version="true"></script>
+}

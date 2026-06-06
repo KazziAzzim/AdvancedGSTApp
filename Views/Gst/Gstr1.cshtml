@@ -1,2 +1,23 @@
 @model IEnumerable<Gstr1RowViewModel>
-<h1>GSTR-1</h1><table class="table table-bordered"><thead><tr><th>Invoice</th><th>Date</th><th>GSTIN</th><th>Customer</th><th>Taxable</th><th>CGST</th><th>SGST</th><th>IGST</th><th>Total</th><th>Status</th></tr></thead><tbody>@foreach(var r in Model){<tr><td>@r.InvoiceNumber</td><td>@r.InvoiceDate.ToShortDateString()</td><td>@r.CustomerGSTIN</td><td>@r.CustomerName</td><td>@r.TaxableAmount</td><td>@r.CGST</td><td>@r.SGST</td><td>@r.IGST</td><td>@r.InvoiceTotal</td><td><span class="badge bg-info">@r.EInvoiceStatus</span></td></tr>}</tbody></table><form asp-action="PrepareReturn" method="post"><input type="hidden" name="returnType" value="GSTR-1"/><input name="month" value="6" type="hidden"/><input name="financialYear" value="2026-27" type="hidden"/><button class="btn btn-primary">Prepare GSTR-1</button></form>
+@{
+    ViewData["Title"] = "GSTR-1";
+}
+
+<div class="page-header">
+    <div><div class="page-kicker">Return filing</div><h1 class="page-title">GSTR-1</h1><p class="page-subtitle">Outward supply invoice details ready for review and return preparation.</p></div>
+    <form asp-action="PrepareReturn" method="post"><input type="hidden" name="returnType" value="GSTR-1" /><input name="month" value="6" type="hidden" /><input name="financialYear" value="2026-27" type="hidden" /><button class="btn btn-primary"><i class="bi bi-journal-check"></i> Prepare GSTR-1</button></form>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-modern data-table">
+            <thead><tr><th>Invoice</th><th>Date</th><th>GSTIN</th><th>Customer</th><th>Taxable</th><th>CGST</th><th>SGST</th><th>IGST</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    <tr><td class="fw-bold">@row.InvoiceNumber</td><td>@row.InvoiceDate.ToShortDateString()</td><td>@row.CustomerGSTIN</td><td>@row.CustomerName</td><td>₹@row.TaxableAmount</td><td>₹@row.CGST</td><td>₹@row.SGST</td><td>₹@row.IGST</td><td class="fw-bold">₹@row.InvoiceTotal</td><td><span class="badge bg-info">@row.EInvoiceStatus</span></td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

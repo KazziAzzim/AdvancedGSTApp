@@ -1,2 +1,48 @@
-using AdvancedGSTApp.Models; using AdvancedGSTApp.Services.Interfaces; using Microsoft.AspNetCore.Authorization; using Microsoft.AspNetCore.Mvc;
-namespace AdvancedGSTApp.Controllers; [Authorize(Roles="Super Admin,Admin,Accountant")] public class GstController(IGstReportService reports, IGstReturnService returns, IGstChallanService challans, IGstApiService api) : Controller { public async Task<IActionResult> PayableSummary(DateTime? from, DateTime? to)=>View(await reports.GetGstPayableSummaryAsync(from,to)); public async Task<IActionResult> Gstr1(int? month,string? financialYear)=>View(await reports.GetGstr1Async(month,financialYear)); public async Task<IActionResult> Gstr3B(int? month,string? financialYear)=>View(await reports.GetGstr3BAsync(month,financialYear)); [HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> PrepareReturn(string returnType,int month,string financialYear){ var filing=await returns.PrepareAsync(returnType,month,financialYear); return RedirectToAction(nameof(ReturnStatus), new{id=filing.Id}); } [HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> SubmitReturn(int id){ await returns.SubmitAsync(id); return RedirectToAction(nameof(ReturnStatus), new{id}); } public IActionResult ReturnStatus(int id)=>View(); public IActionResult Challan()=>View(new GstChallan()); [HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> Challan(GstChallan model){ await challans.SaveAsync(model); await challans.GenerateAsync(model.Id); return RedirectToAction(nameof(PayableSummary)); } public async Task<IActionResult> ValidateGstin(string gstin)=>Json(await api.ValidateGstinAsync(gstin)); }
+using AdvancedGSTApp.Models;
+using AdvancedGSTApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AdvancedGSTApp.Controllers;
+
+[Authorize(Roles = "Super Admin,Admin,Accountant")]
+public class GstController(
+    IGstReportService reports,
+    IGstReturnService returns,
+    IGstChallanService challans,
+    IGstApiService api) : Controller
+{
+    public async Task<IActionResult> PayableSummary(DateTime? from, DateTime? to) => View(await reports.GetGstPayableSummaryAsync(from, to));
+
+    public async Task<IActionResult> Gstr1(int? month, string? financialYear) => View(await reports.GetGstr1Async(month, financialYear));
+
+    public async Task<IActionResult> Gstr3B(int? month, string? financialYear) => View(await reports.GetGstr3BAsync(month, financialYear));
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> PrepareReturn(string returnType, int month, string financialYear)
+    {
+        var filing = await returns.PrepareAsync(returnType, month, financialYear);
+        return RedirectToAction(nameof(ReturnStatus), new { id = filing.Id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubmitReturn(int id)
+    {
+        await returns.SubmitAsync(id);
+        return RedirectToAction(nameof(ReturnStatus), new { id });
+    }
+
+    public IActionResult ReturnStatus(int id) => View();
+
+    public IActionResult Challan() => View(new GstChallan());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Challan(GstChallan model)
+    {
+        await challans.SaveAsync(model);
+        await challans.GenerateAsync(model.Id);
+        return RedirectToAction(nameof(PayableSummary));
+    }
+
+    public async Task<IActionResult> ValidateGstin(string gstin) => Json(await api.ValidateGstinAsync(gstin));
+}

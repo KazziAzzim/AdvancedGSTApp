@@ -1,2 +1,24 @@
 @model GstPayableSummaryViewModel
-<h1>GST Payable Summary</h1><div class="row g-3"><div class="col-md-4"><div class="card"><div class="card-body"><h5>Output CGST</h5><h3>@Model.OutputCGST</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><h5>Output SGST</h5><h3>@Model.OutputSGST</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><h5>Output IGST</h5><h3>@Model.OutputIGST</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><h5>Input CGST</h5><h3>@Model.InputCGST</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><h5>Input SGST</h5><h3>@Model.InputSGST</h3></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><h5>Input IGST</h5><h3>@Model.InputIGST</h3></div></div></div></div><div class="alert alert-primary mt-3"><strong>Total GST Payable:</strong> ₹@Model.TotalGstPayable.ToString("N2")</div>
+@{
+    ViewData["Title"] = "GST Payable Summary";
+}
+
+<div class="page-header">
+    <div><div class="page-kicker">Tax position</div><h1 class="page-title">GST Payable Summary</h1><p class="page-subtitle">Compare output tax and input tax credit in a clean compliance dashboard.</p></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon"><i class="bi bi-arrow-up-right"></i></div><span class="stat-label">Output CGST</span><h3 class="stat-value">₹@Model.OutputCGST</h3></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon"><i class="bi bi-arrow-up-right"></i></div><span class="stat-label">Output SGST</span><h3 class="stat-value">₹@Model.OutputSGST</h3></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon"><i class="bi bi-arrow-up-right"></i></div><span class="stat-label">Output IGST</span><h3 class="stat-value">₹@Model.OutputIGST</h3></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon"><i class="bi bi-arrow-down-left"></i></div><span class="stat-label">Input CGST</span><h3 class="stat-value">₹@Model.InputCGST</h3></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon"><i class="bi bi-arrow-down-left"></i></div><span class="stat-label">Input SGST</span><h3 class="stat-value">₹@Model.InputSGST</h3></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon"><i class="bi bi-arrow-down-left"></i></div><span class="stat-label">Input IGST</span><h3 class="stat-value">₹@Model.InputIGST</h3></div></div>
+</div>
+
+<div class="section-card grand-total mt-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div><div class="page-kicker mb-1">Net liability</div><h3 class="mb-0">Total GST Payable</h3></div>
+        <h2 class="mb-0">₹@Model.TotalGstPayable.ToString("N2")</h2>
+    </div>
+</div>

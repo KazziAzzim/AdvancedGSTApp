@@ -1,2 +1,32 @@
 @model IEnumerable<SalesInvoice>
-<table class="table table-sm table-striped"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th>Total</th></tr></thead><tbody>@foreach(var i in Model){<tr><td>@i.InvoiceNumber</td><td>@i.InvoiceDate.ToShortDateString()</td><td>@i.Customer?.CustomerName</td><td>₹@i.GrandTotal.ToString("N2")</td></tr>}</tbody></table>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var invoice in Model)
+                {
+                    <tr>
+                        <td><strong>@invoice.InvoiceNumber</strong></td>
+                        <td>@invoice.InvoiceDate.ToShortDateString()</td>
+                        <td>@invoice.Customer?.CustomerName</td>
+                        <td class="text-end fw-bold">₹@invoice.GrandTotal.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="empty-state"><i class="bi bi-receipt"></i>No recent sales invoices found.</div>
+}

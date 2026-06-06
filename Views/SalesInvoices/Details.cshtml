@@ -1,2 +1,79 @@
 @model SalesInvoice
-<div class="invoice-print"><div class="d-flex justify-content-between"><h1>GST Invoice</h1><button onclick="window.print()" class="btn btn-outline-secondary no-print">Print</button></div><h4>@Model.InvoiceNumber</h4><p>Date: @Model.InvoiceDate.ToShortDateString() | Place of supply: @Model.PlaceOfSupply</p><p><strong>Customer:</strong> @Model.Customer?.CustomerName<br/>GSTIN: @Model.Customer?.GSTIN<br/>@Model.BillingAddress</p><table class="table table-bordered"><thead><tr><th>Description</th><th>HSN/SAC</th><th>Qty</th><th>Rate</th><th>Taxable</th><th>CGST</th><th>SGST</th><th>IGST</th><th>Total</th></tr></thead><tbody>@foreach(var i in Model.Items){<tr><td>@i.Description</td><td>@i.HsnSac</td><td>@i.Quantity</td><td>@i.Rate</td><td>@i.TaxableAmount</td><td>@i.CGSTAmount</td><td>@i.SGSTAmount</td><td>@i.IGSTAmount</td><td>@i.LineTotal</td></tr>}</tbody></table><div class="text-end"><p>Taxable: ₹@Model.TaxableAmount.ToString("N2")</p><p>GST: ₹@Model.TotalGSTAmount.ToString("N2")</p><h3>Grand Total: ₹@Model.GrandTotal.ToString("N2")</h3><p>@Model.AmountInWords</p></div><p>IRN: @Model.IRNNumber</p><p>QR: @Model.QRCode</p><p>E-Way Bill: @Model.EWayBillNumber</p></div><form asp-action="GenerateEInvoice" asp-route-id="@Model.Id" method="post" class="d-inline no-print"><button class="btn btn-primary">Generate E-Invoice</button></form><form asp-action="GenerateEWayBill" asp-route-id="@Model.Id" method="post" class="d-inline no-print"><button class="btn btn-warning">Generate E-Way Bill</button></form><a asp-action="DownloadPdf" asp-route-id="@Model.Id" class="btn btn-success no-print">Download PDF</a>
+@{
+    ViewData["Title"] = "Invoice Details";
+}
+
+<div class="page-header no-print">
+    <div>
+        <div class="page-kicker">Invoice preview</div>
+        <h1 class="page-title">GST Invoice @Model.InvoiceNumber</h1>
+        <p class="page-subtitle">Review, print, download PDF, and generate GST integration documents.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <button onclick="window.print()" class="btn btn-outline-secondary"><i class="bi bi-printer"></i> Print</button>
+        <a asp-action="DownloadPdf" asp-route-id="@Model.Id" class="btn btn-success"><i class="bi bi-download"></i> Download PDF</a>
+    </div>
+</div>
+
+<div class="invoice-print">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+        <div>
+            <div class="page-kicker">Tax invoice</div>
+            <h1 class="page-title">GST Invoice</h1>
+            <h4>@Model.InvoiceNumber</h4>
+            <p class="text-muted mb-0">Date: @Model.InvoiceDate.ToShortDateString() | Place of supply: @Model.PlaceOfSupply</p>
+        </div>
+        <span class="badge bg-secondary">@Model.EInvoiceStatus</span>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="section-card h-100 shadow-none">
+                <h6>Bill To</h6>
+                <strong>@Model.Customer?.CustomerName</strong><br />
+                GSTIN: @Model.Customer?.GSTIN<br />
+                @Model.BillingAddress
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="section-card h-100 shadow-none">
+                <h6>Compliance Details</h6>
+                <p class="mb-1"><strong>IRN:</strong> @Model.IRNNumber</p>
+                <p class="mb-1"><strong>QR:</strong> @Model.QRCode</p>
+                <p class="mb-0"><strong>E-Way Bill:</strong> @Model.EWayBillNumber</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-modern">
+            <thead><tr><th>Description</th><th>HSN/SAC</th><th>Qty</th><th>Rate</th><th>Taxable</th><th>CGST</th><th>SGST</th><th>IGST</th><th>Total</th></tr></thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Description</td><td>@item.HsnSac</td><td>@item.Quantity</td><td>@item.Rate</td><td>@item.TaxableAmount</td><td>@item.CGSTAmount</td><td>@item.SGSTAmount</td><td>@item.IGSTAmount</td><td class="fw-bold">@item.LineTotal</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row justify-content-end mt-4">
+        <div class="col-md-5">
+            <div class="section-card grand-total shadow-none">
+                <div class="d-flex justify-content-between"><span>Taxable</span><strong>₹@Model.TaxableAmount.ToString("N2")</strong></div>
+                <div class="d-flex justify-content-between"><span>GST</span><strong>₹@Model.TotalGSTAmount.ToString("N2")</strong></div>
+                <hr />
+                <div class="d-flex justify-content-between fs-4"><span>Grand Total</span><strong>₹@Model.GrandTotal.ToString("N2")</strong></div>
+                <p class="text-muted mb-0 mt-2">@Model.AmountInWords</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mt-3 no-print">
+    <form asp-action="GenerateEInvoice" asp-route-id="@Model.Id" method="post" class="d-inline"><button class="btn btn-primary"><i class="bi bi-lightning-charge"></i> Generate E-Invoice</button></form>
+    <form asp-action="GenerateEWayBill" asp-route-id="@Model.Id" method="post" class="d-inline"><button class="btn btn-warning"><i class="bi bi-truck"></i> Generate E-Way Bill</button></form>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
