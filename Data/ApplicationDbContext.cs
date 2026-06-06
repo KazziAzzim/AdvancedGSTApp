@@ -18,15 +18,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        foreach (var entityType in builder.Model.GetEntityTypes().Where(e => typeof(AuditableEntity).IsAssignableFrom(e.ClrType) && e.BaseType is null))
+        foreach (var entityType in builder.Model.GetEntityTypes().Where(e => typeof(AuditableEntity).IsAssignableFrom(e.ClrType)))
         {
             builder.Entity(entityType.ClrType).HasQueryFilter(CreateSoftDeleteFilter(entityType.ClrType));
         }
         foreach (var property in builder.Model.GetEntityTypes().SelectMany(t => t.GetProperties()).Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?))) { property.SetPrecision(18); property.SetScale(2); }
         builder.Entity<SalesInvoice>().HasMany(x => x.Items).WithOne(x => x.SalesInvoice).HasForeignKey(x => x.SalesInvoiceId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<PurchaseInvoice>().HasMany(x => x.Items).WithOne(x => x.PurchaseInvoice).HasForeignKey(x => x.PurchaseInvoiceId).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<CreditNote>().HasMany(x => x.Items).WithOne(x => x.CreditNote).HasForeignKey(x => x.CreditNoteId).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<DebitNote>().HasMany(x => x.Items).WithOne(x => x.DebitNote).HasForeignKey(x => x.DebitNoteId).OnDelete(DeleteBehavior.Cascade);
     }
 
     private static System.Linq.Expressions.LambdaExpression CreateSoftDeleteFilter(Type entityType)

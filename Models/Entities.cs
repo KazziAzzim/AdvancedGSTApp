@@ -97,46 +97,9 @@ public class SalesInvoiceItem : AuditableEntity
 public class PurchaseInvoice : AuditableEntity { public string PurchaseInvoiceNumber { get; set; } = string.Empty; public string SupplierInvoiceNumber { get; set; } = string.Empty; public DateTime InvoiceDate { get; set; } = DateTime.Today; public int SupplierId { get; set; } public Supplier? Supplier { get; set; } public decimal TaxableAmount { get; set; } public decimal CGSTAmount { get; set; } public decimal SGSTAmount { get; set; } public decimal IGSTAmount { get; set; } public decimal TotalGSTAmount { get; set; } public decimal DiscountAmount { get; set; } public decimal GrandTotal { get; set; } public string? Notes { get; set; } public decimal ITCEligibleAmount { get; set; } public List<PurchaseInvoiceItem> Items { get; set; } = []; }
 public class PurchaseInvoiceItem : AuditableEntity { public int PurchaseInvoiceId { get; set; } public PurchaseInvoice? PurchaseInvoice { get; set; } public string Description { get; set; } = string.Empty; public string HsnSac { get; set; } = string.Empty; public decimal Quantity { get; set; } public decimal Rate { get; set; } public decimal TaxableAmount { get; set; } public decimal GSTPercentage { get; set; } public decimal CGSTAmount { get; set; } public decimal SGSTAmount { get; set; } public decimal IGSTAmount { get; set; } public decimal LineTotal { get; set; } }
 public class CreditNote : AuditableEntity { public string CreditNoteNumber { get; set; } = string.Empty; public DateTime Date { get; set; } = DateTime.Today; public int CustomerId { get; set; } public int? ReferenceSalesInvoiceId { get; set; } public string Reason { get; set; } = string.Empty; public decimal TaxableAmount { get; set; } public decimal CGSTAmount { get; set; } public decimal SGSTAmount { get; set; } public decimal IGSTAmount { get; set; } public decimal GSTAmount { get; set; } public decimal GrandTotal { get; set; } public List<CreditNoteItem> Items { get; set; } = []; }
-public class CreditNoteItem : AuditableEntity
-{
-    public int CreditNoteId { get; set; }
-    public CreditNote? CreditNote { get; set; }
-    public string ItemType { get; set; } = "Product";
-    public int? ProductId { get; set; }
-    public int? ServiceItemId { get; set; }
-    public string Description { get; set; } = string.Empty;
-    public string HsnSac { get; set; } = string.Empty;
-    public decimal Quantity { get; set; }
-    public string Unit { get; set; } = string.Empty;
-    public decimal Rate { get; set; }
-    public decimal DiscountPercentage { get; set; }
-    public decimal DiscountAmount { get; set; }
-    public decimal TaxableAmount { get; set; }
-    public decimal GSTPercentage { get; set; }
-    public decimal CGSTPercentage { get; set; }
-    public decimal CGSTAmount { get; set; }
-    public decimal SGSTPercentage { get; set; }
-    public decimal SGSTAmount { get; set; }
-    public decimal IGSTPercentage { get; set; }
-    public decimal IGSTAmount { get; set; }
-    public decimal LineTotal { get; set; }
-}
+public class CreditNoteItem : SalesInvoiceItem { public int CreditNoteId { get; set; } }
 public class DebitNote : AuditableEntity { public string DebitNoteNumber { get; set; } = string.Empty; public DateTime Date { get; set; } = DateTime.Today; public int SupplierId { get; set; } public int? ReferencePurchaseInvoiceId { get; set; } public string Reason { get; set; } = string.Empty; public decimal TaxableAmount { get; set; } public decimal CGSTAmount { get; set; } public decimal SGSTAmount { get; set; } public decimal IGSTAmount { get; set; } public decimal GSTAmount { get; set; } public decimal GrandTotal { get; set; } public List<DebitNoteItem> Items { get; set; } = []; }
-public class DebitNoteItem : AuditableEntity
-{
-    public int DebitNoteId { get; set; }
-    public DebitNote? DebitNote { get; set; }
-    public string Description { get; set; } = string.Empty;
-    public string HsnSac { get; set; } = string.Empty;
-    public decimal Quantity { get; set; }
-    public decimal Rate { get; set; }
-    public decimal TaxableAmount { get; set; }
-    public decimal GSTPercentage { get; set; }
-    public decimal CGSTAmount { get; set; }
-    public decimal SGSTAmount { get; set; }
-    public decimal IGSTAmount { get; set; }
-    public decimal LineTotal { get; set; }
-}
+public class DebitNoteItem : PurchaseInvoiceItem { public int DebitNoteId { get; set; } }
 public class Expense : AuditableEntity { public DateTime ExpenseDate { get; set; } = DateTime.Today; public string ExpenseCategory { get; set; } = string.Empty; public string VendorName { get; set; } = string.Empty; public string? GSTIN { get; set; } public string InvoiceNumber { get; set; } = string.Empty; public decimal Amount { get; set; } public decimal GSTPercentage { get; set; } public decimal CGSTAmount { get; set; } public decimal SGSTAmount { get; set; } public decimal IGSTAmount { get; set; } public decimal TotalAmount { get; set; } public bool IsITCEligible { get; set; } public string? Notes { get; set; } }
 public class Receipt : AuditableEntity { public string ReceiptNumber { get; set; } = string.Empty; public DateTime ReceiptDate { get; set; } = DateTime.Today; public int CustomerId { get; set; } public string PaymentMode { get; set; } = string.Empty; public decimal Amount { get; set; } public int? ReferenceInvoiceId { get; set; } public string? Notes { get; set; } }
 public class Payment : AuditableEntity { public string PaymentNumber { get; set; } = string.Empty; public DateTime PaymentDate { get; set; } = DateTime.Today; public int SupplierId { get; set; } public string PaymentMode { get; set; } = string.Empty; public decimal Amount { get; set; } public int? ReferencePurchaseInvoiceId { get; set; } public string? Notes { get; set; } }
