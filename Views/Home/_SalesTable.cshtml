@@ -1,0 +1,2 @@
+@model IEnumerable<SalesInvoice>
+<table class="table table-sm table-striped"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th>Total</th></tr></thead><tbody>@foreach(var i in Model){<tr><td>@i.InvoiceNumber</td><td>@i.InvoiceDate.ToShortDateString()</td><td>@i.Customer?.CustomerName</td><td>₹@i.GrandTotal.ToString("N2")</td></tr>}</tbody></table>

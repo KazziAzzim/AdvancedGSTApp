@@ -1,0 +1,2 @@
+@model GstChallan
+<h1>GST Challan</h1><form asp-action="Challan" method="post"><div class="row"><div class="col"><input asp-for="Period" class="form-control" placeholder="Period"/></div><div class="col"><input asp-for="CGSTAmount" class="form-control" placeholder="CGST"/></div><div class="col"><input asp-for="SGSTAmount" class="form-control" placeholder="SGST"/></div><div class="col"><input asp-for="IGSTAmount" class="form-control" placeholder="IGST"/></div></div><button class="btn btn-primary mt-3">Generate</button></form>
