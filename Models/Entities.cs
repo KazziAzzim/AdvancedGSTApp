@@ -5,9 +5,12 @@ namespace AdvancedGSTApp.Models;
 
 public class ApplicationUser : IdentityUser
 {
+    public int? TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     [StringLength(150)] public string FullName { get; set; } = string.Empty;
     [StringLength(300)] public string? ProfilePhoto { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool IsPlatformUser { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedDate { get; set; }
     public DateTime? LastLoginDate { get; set; }
@@ -15,6 +18,9 @@ public class ApplicationUser : IdentityUser
 
 public class ApplicationRole : IdentityRole
 {
+    public int? TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+    public bool IsPlatformRole { get; set; }
     [StringLength(500)] public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
@@ -24,6 +30,8 @@ public class ApplicationRole : IdentityRole
 public class RolePermission
 {
     public int Id { get; set; }
+    public int? TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     [Required] public string RoleId { get; set; } = string.Empty;
     public ApplicationRole? Role { get; set; }
     [Required, StringLength(120)] public string ModuleName { get; set; } = string.Empty;
@@ -41,16 +49,116 @@ public class RolePermission
 }
 
 
-public abstract class AuditableEntity
+public interface ITenantEntity
+{
+    int TenantId { get; set; }
+}
+
+public abstract class TenantEntity : ITenantEntity
 {
     public int Id { get; set; }
-    public string? CreatedBy { get; set; }
+    public int TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-    public string? UpdatedBy { get; set; }
     public DateTime? UpdatedDate { get; set; }
+    public bool IsDeleted { get; set; }
+}
+
+public abstract class AuditableEntity : TenantEntity
+{
+    public string? CreatedBy { get; set; }
+    public string? UpdatedBy { get; set; }
     public string? DeletedBy { get; set; }
     public DateTime? DeletedDate { get; set; }
+}
+
+public class Tenant
+{
+    public int Id { get; set; }
+    [Required, StringLength(150)] public string TenantName { get; set; } = string.Empty;
+    [Required, StringLength(200)] public string BusinessName { get; set; } = string.Empty;
+    [RegularExpression(@"^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$")] public string GSTIN { get; set; } = string.Empty;
+    [RegularExpression(@"^[A-Z]{5}[0-9]{4}[A-Z]$")] public string PANNumber { get; set; } = string.Empty;
+    [Required, StringLength(150)] public string ContactPersonName { get; set; } = string.Empty;
+    [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+    [Phone] public string PhoneNumber { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string Pincode { get; set; } = string.Empty;
+    public string? Subdomain { get; set; }
+    public string? DatabaseName { get; set; }
+    public string? LogoPath { get; set; }
+    public bool IsActive { get; set; } = true;
+    public bool IsTrial { get; set; } = true;
+    public DateTime? TrialStartDate { get; set; }
+    public DateTime? TrialEndDate { get; set; }
+    public int? SubscriptionPlanId { get; set; }
+    public SubscriptionPlan? SubscriptionPlan { get; set; }
+    public DateTime? SubscriptionStartDate { get; set; }
+    public DateTime? SubscriptionEndDate { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+    public string? CreatedBy { get; set; }
+    public string? UpdatedBy { get; set; }
     public bool IsDeleted { get; set; }
+}
+
+public class SubscriptionPlan
+{
+    public int Id { get; set; }
+    [Required, StringLength(100)] public string PlanName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal MonthlyPrice { get; set; }
+    public decimal YearlyPrice { get; set; }
+    public int MaxUsers { get; set; }
+    public int MaxInvoicesPerMonth { get; set; }
+    public int MaxCompanies { get; set; } = 1;
+    public bool HasEInvoice { get; set; }
+    public bool HasEWayBill { get; set; }
+    public bool HasGstReconciliation { get; set; }
+    public bool HasGstApiIntegration { get; set; }
+    public bool HasAdvancedReports { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+}
+
+public class TenantSubscription
+{
+    public int Id { get; set; }
+    public int TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+    public int SubscriptionPlanId { get; set; }
+    public SubscriptionPlan? SubscriptionPlan { get; set; }
+    public DateTime StartDate { get; set; } = DateTime.UtcNow;
+    public DateTime EndDate { get; set; } = DateTime.UtcNow.AddDays(14);
+    public string BillingCycle { get; set; } = "Trial";
+    public decimal Amount { get; set; }
+    public string Status { get; set; } = "Trial";
+    public string PaymentStatus { get; set; } = "Pending";
+    public string? PaymentReferenceNumber { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+}
+
+public class SaasPayment
+{
+    public int Id { get; set; }
+    public int TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+    public int SubscriptionPlanId { get; set; }
+    public SubscriptionPlan? SubscriptionPlan { get; set; }
+    public int? TenantSubscriptionId { get; set; }
+    public TenantSubscription? TenantSubscription { get; set; }
+    public string InvoiceNumber { get; set; } = string.Empty;
+    public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
+    public decimal Amount { get; set; }
+    public string PaymentMode { get; set; } = "Manual";
+    public string PaymentStatus { get; set; } = "Pending";
+    public string? TransactionReference { get; set; }
+    public string? Notes { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 }
 
 public class CompanyProfile : AuditableEntity
@@ -360,6 +468,9 @@ public class AuditLog : AuditableEntity
     public string ActionType { get; set; } = string.Empty; public string EntityName { get; set; } = string.Empty; public string EntityId { get; set; } = string.Empty; public string? OldValue { get; set; }
     public string? NewValue { get; set; }
     public string? UserId { get; set; }
+    public string ModuleName { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public string? IpAddress { get; set; }
 }
 public class AppSetting : AuditableEntity
 {
