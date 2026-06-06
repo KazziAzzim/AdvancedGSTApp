@@ -1,2 +1,23 @@
 @model IEnumerable<PurchaseInvoice>
-<h1>Purchase Invoices <a class="btn btn-primary btn-sm" asp-action="Create">Create</a></h1><table class="table table-striped"><thead><tr><th>No</th><th>Supplier Invoice</th><th>Date</th><th>Supplier</th><th>ITC</th><th>Total</th></tr></thead><tbody>@foreach(var x in Model){<tr><td>@x.PurchaseInvoiceNumber</td><td>@x.SupplierInvoiceNumber</td><td>@x.InvoiceDate.ToShortDateString()</td><td>@x.Supplier?.SupplierName</td><td>@x.ITCEligibleAmount</td><td>@x.GrandTotal</td></tr>}</tbody></table>
+@{
+    ViewData["Title"] = "Purchase Invoices";
+}
+
+<div class="page-header">
+    <div><div class="page-kicker">Procurement</div><h1 class="page-title">Purchase Invoices</h1><p class="page-subtitle">Track supplier invoices, eligible ITC, and total purchase values.</p></div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i> Create Purchase</a>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-modern data-table">
+            <thead><tr><th>No</th><th>Supplier Invoice</th><th>Date</th><th>Supplier</th><th>ITC</th><th>Total</th></tr></thead>
+            <tbody>
+                @foreach (var invoice in Model)
+                {
+                    <tr><td class="fw-bold">@invoice.PurchaseInvoiceNumber</td><td>@invoice.SupplierInvoiceNumber</td><td>@invoice.InvoiceDate.ToShortDateString()</td><td>@invoice.Supplier?.SupplierName</td><td><span class="badge bg-success">₹@invoice.ITCEligibleAmount</span></td><td class="fw-bold">₹@invoice.GrandTotal</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

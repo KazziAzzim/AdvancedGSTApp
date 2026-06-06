@@ -1,2 +1,18 @@
 @model GstChallan
-<h1>GST Challan</h1><form asp-action="Challan" method="post"><div class="row"><div class="col"><input asp-for="Period" class="form-control" placeholder="Period"/></div><div class="col"><input asp-for="CGSTAmount" class="form-control" placeholder="CGST"/></div><div class="col"><input asp-for="SGSTAmount" class="form-control" placeholder="SGST"/></div><div class="col"><input asp-for="IGSTAmount" class="form-control" placeholder="IGST"/></div></div><button class="btn btn-primary mt-3">Generate</button></form>
+@{
+    ViewData["Title"] = "GST Challan";
+}
+
+<div class="page-header">
+    <div><div class="page-kicker">GST payment</div><h1 class="page-title">GST Challan</h1><p class="page-subtitle">Generate a challan with period-wise CGST, SGST, and IGST amounts.</p></div>
+</div>
+
+<form asp-action="Challan" method="post" class="section-card">
+    <div class="row g-3">
+        <div class="col-md-3"><label asp-for="Period" class="form-label"></label><input asp-for="Period" class="form-control" placeholder="Period" /></div>
+        <div class="col-md-3"><label asp-for="CGSTAmount" class="form-label"></label><input asp-for="CGSTAmount" class="form-control" placeholder="CGST" /></div>
+        <div class="col-md-3"><label asp-for="SGSTAmount" class="form-label"></label><input asp-for="SGSTAmount" class="form-control" placeholder="SGST" /></div>
+        <div class="col-md-3"><label asp-for="IGSTAmount" class="form-label"></label><input asp-for="IGSTAmount" class="form-control" placeholder="IGST" /></div>
+    </div>
+    <button class="btn btn-primary mt-4"><i class="bi bi-file-earmark-plus"></i> Generate Challan</button>
+</form>

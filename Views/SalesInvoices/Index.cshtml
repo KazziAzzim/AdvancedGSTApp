@@ -1,2 +1,36 @@
 @model IEnumerable<SalesInvoice>
-<h1>Sales Invoices <a class="btn btn-primary btn-sm" asp-action="Create">Create</a></h1><table class="table table-striped data-table"><thead><tr><th>No</th><th>Date</th><th>Customer</th><th>Taxable</th><th>GST</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>@foreach(var x in Model){<tr><td>@x.InvoiceNumber</td><td>@x.InvoiceDate.ToShortDateString()</td><td>@x.Customer?.CustomerName</td><td>@x.TaxableAmount</td><td>@x.TotalGSTAmount</td><td>@x.GrandTotal</td><td><span class="badge bg-secondary">@x.EInvoiceStatus</span></td><td><a asp-action="Details" asp-route-id="@x.Id">View</a></td></tr>}</tbody></table>
+@{
+    ViewData["Title"] = "Sales Invoices";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-kicker">Revenue operations</div>
+        <h1 class="page-title">Sales Invoices</h1>
+        <p class="page-subtitle">Track invoice totals, GST values, and e-invoice compliance status.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i> Create Invoice</a>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-modern data-table">
+            <thead><tr><th>No</th><th>Date</th><th>Customer</th><th>Taxable</th><th>GST</th><th>Total</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var invoice in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@invoice.InvoiceNumber</td>
+                        <td>@invoice.InvoiceDate.ToShortDateString()</td>
+                        <td>@invoice.Customer?.CustomerName</td>
+                        <td>₹@invoice.TaxableAmount</td>
+                        <td>₹@invoice.TotalGSTAmount</td>
+                        <td class="fw-bold">₹@invoice.GrandTotal</td>
+                        <td><span class="badge bg-secondary">@invoice.EInvoiceStatus</span></td>
+                        <td class="text-end"><a class="btn btn-outline-primary btn-sm" asp-action="Details" asp-route-id="@invoice.Id"><i class="bi bi-eye"></i> View</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

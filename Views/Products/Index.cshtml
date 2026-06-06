@@ -1,2 +1,39 @@
 @model IEnumerable<Product>
-<h1>Products <a class="btn btn-primary btn-sm" asp-action="Create">Add</a></h1><table class="table table-striped data-table"><thead><tr><th>Code</th><th>Name</th><th>HSN</th><th>GST</th><th>Sale Rate</th><th></th></tr></thead><tbody>@foreach(var x in Model){<tr><td>@x.ProductCode</td><td>@x.ProductName</td><td>@x.HSNCode</td><td>@x.GSTPercentage%</td><td>@x.SaleRate</td><td><a asp-action="Edit" asp-route-id="@x.Id">Edit</a><form asp-action="Delete" asp-route-id="@x.Id" method="post" class="d-inline delete-form"><button class="btn btn-link text-danger">Delete</button></form></td></tr>}</tbody></table>
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-kicker">Inventory catalog</div>
+        <h1 class="page-title">Products</h1>
+        <p class="page-subtitle">Maintain HSN, GST percentage, sale rates, purchase rates, and stock visibility.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i> Add Product</a>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-modern data-table">
+            <thead><tr><th>Code</th><th>Name</th><th>HSN</th><th>GST</th><th>Sale Rate</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var product in Model)
+                {
+                    <tr>
+                        <td><span class="badge bg-light text-dark">@product.ProductCode</span></td>
+                        <td class="fw-bold">@product.ProductName</td>
+                        <td>@product.HSNCode</td>
+                        <td><span class="badge bg-info">@product.GSTPercentage%</span></td>
+                        <td>₹@product.SaleRate</td>
+                        <td class="text-end">
+                            <a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@product.Id"><i class="bi bi-pencil-square"></i> Edit</a>
+                            <form asp-action="Delete" asp-route-id="@product.Id" method="post" class="d-inline delete-form">
+                                <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

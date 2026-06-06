@@ -1,2 +1,6 @@
 @model IEnumerable<Gstr1RowViewModel>
-<h1>Sales Register</h1><partial name="../Gst/Gstr1" model="Model" />
+@{
+    ViewData["Title"] = "Sales Register";
+}
+
+<partial name="../Gst/Gstr1" model="Model" />

@@ -1,2 +1,37 @@
 @model IEnumerable<Supplier>
-<h1>Suppliers <a class="btn btn-primary btn-sm" asp-action="Create">Add</a></h1><table class="table table-striped data-table"><thead><tr><th>Name</th><th>GSTIN</th><th>State</th><th></th></tr></thead><tbody>@foreach(var x in Model){<tr><td>@x.SupplierName</td><td>@x.GSTIN</td><td>@x.State</td><td><a asp-action="Edit" asp-route-id="@x.Id">Edit</a><form asp-action="Delete" asp-route-id="@x.Id" method="post" class="d-inline delete-form"><button class="btn btn-link text-danger">Delete</button></form></td></tr>}</tbody></table>
+@{
+    ViewData["Title"] = "Suppliers";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-kicker">Master data</div>
+        <h1 class="page-title">Suppliers</h1>
+        <p class="page-subtitle">Organize vendor GST registration and purchase compliance details.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i> Add Supplier</a>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-modern data-table">
+            <thead><tr><th>Name</th><th>GSTIN</th><th>State</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var supplier in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@supplier.SupplierName</td>
+                        <td><span class="badge bg-light text-dark">@supplier.GSTIN</span></td>
+                        <td>@supplier.State</td>
+                        <td class="text-end">
+                            <a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@supplier.Id"><i class="bi bi-pencil-square"></i> Edit</a>
+                            <form asp-action="Delete" asp-route-id="@supplier.Id" method="post" class="d-inline delete-form">
+                                <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

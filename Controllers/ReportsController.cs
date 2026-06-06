@@ -1,2 +1,11 @@
-using AdvancedGSTApp.Services.Interfaces; using Microsoft.AspNetCore.Authorization; using Microsoft.AspNetCore.Mvc;
-namespace AdvancedGSTApp.Controllers; [Authorize] public class ReportsController(IGstReportService reports) : Controller { public async Task<IActionResult> SalesRegister()=>View(await reports.GetGstr1Async(null,null)); public async Task<IActionResult> GstPayable()=>View("../Gst/PayableSummary", await reports.GetGstPayableSummaryAsync(null,null)); public IActionResult PurchaseRegister()=>View(); public IActionResult ExpenseRegister()=>View(); public IActionResult CustomerOutstanding()=>View(); public IActionResult SupplierOutstanding()=>View(); public IActionResult Filing()=>View(); }
+using AdvancedGSTApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AdvancedGSTApp.Controllers;
+
+[Authorize(Roles = "Super Admin,Admin,Accountant")]
+public class ReportsController(IGstReportService reports) : Controller
+{
+    public async Task<IActionResult> SalesRegister(int? month, string? financialYear) => View(await reports.GetGstr1Async(month, financialYear));
+}
