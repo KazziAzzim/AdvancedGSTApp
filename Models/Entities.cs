@@ -3,6 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AdvancedGSTApp.Models;
 
+public interface ITenantEntity
+{
+    int TenantId { get; set; }
+}
+
 public class ApplicationUser : IdentityUser
 {
     public int? TenantId { get; set; }
