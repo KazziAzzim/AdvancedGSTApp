@@ -1,0 +1,13 @@
+@model PlatformDashboardViewModel
+@{ ViewData["Title"] = "Platform Dashboard"; }
+<div class="page-header"><div><span class="eyebrow">Super Admin</span><h1>Platform Dashboard</h1><p>Tenant, subscription, and SaaS revenue overview.</p></div></div>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="stat-card"><span>Total tenants</span><strong>@Model.TotalTenants</strong></div></div>
+    <div class="col-md-3"><div class="stat-card"><span>Active</span><strong>@Model.ActiveTenants</strong></div></div>
+    <div class="col-md-3"><div class="stat-card"><span>Trials</span><strong>@Model.TrialTenants</strong></div></div>
+    <div class="col-md-3"><div class="stat-card"><span>Expired</span><strong>@Model.ExpiredTenants</strong></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-lg-6"><div class="card table-card"><div class="card-header"><strong>Recent tenant registrations</strong></div><div class="table-responsive"><table class="table"><tbody>@foreach (var tenant in Model.RecentTenantRegistrations){<tr><td>@tenant.BusinessName<br /><small>@tenant.Email</small></td><td><span class="badge bg-@(tenant.IsActive ? "success" : "secondary")">@(tenant.IsActive ? "Active" : "Inactive")</span></td><td>@tenant.CreatedDate.ToString("dd MMM yyyy")</td></tr>}</tbody></table></div></div></div>
+    <div class="col-lg-6"><div class="card table-card"><div class="card-header"><strong>Expiring subscriptions</strong></div><div class="table-responsive"><table class="table"><tbody>@foreach (var item in Model.ExpiringSubscriptions){<tr><td>@item.Tenant?.BusinessName<br /><small>@item.SubscriptionPlan?.PlanName</small></td><td><span class="badge bg-warning text-dark">@item.Status</span></td><td>@item.EndDate.ToString("dd MMM yyyy")</td></tr>}</tbody></table></div></div></div>
+</div>

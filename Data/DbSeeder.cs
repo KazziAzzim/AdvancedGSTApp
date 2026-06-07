@@ -22,8 +22,9 @@ public static class DbSeeder
 
         await SeedRolesAsync(roleManager);
         await SeedSuperAdminAsync(userManager);
+        var demoTenantId = await SeedSaasDataAsync(db, userManager);
         await SeedRolePermissionsAsync(db, roleManager);
-        await SeedMasterDataAsync(db);
+        await SeedMasterDataAsync(db, demoTenantId);
     }
 
     private static async Task ApplyDatabaseChangesAsync(ApplicationDbContext db)
@@ -53,11 +54,13 @@ public static class DbSeeder
         // Default application roles used by authorization and the demo admin user.
         var roles = new[]
         {
-            new ApplicationRole { Name = SuperAdminRole, Description = "Full access to all application modules and settings." },
-            new ApplicationRole { Name = "Admin", Description = "Administrative access to master data and transactions." },
-            new ApplicationRole { Name = "Accountant", Description = "Accounting, GST return, invoice, and report access." },
-            new ApplicationRole { Name = "Staff", Description = "Limited day-to-day operational access." },
-            new ApplicationRole { Name = "Viewer", Description = "Read-only dashboard and reporting access." }
+            new ApplicationRole { Name = SuperAdminRole, IsPlatformRole = true, Description = "Full platform access to tenants, plans, subscriptions, and settings." },
+            new ApplicationRole { Name = "Support Admin", IsPlatformRole = true, Description = "Platform support access for tenant assistance." },
+            new ApplicationRole { Name = "Admin", IsPlatformRole = false, Description = "Legacy administrative access retained for backward compatibility." },
+            new ApplicationRole { Name = "Tenant Admin", IsPlatformRole = false, Description = "Tenant administrator for users, GST data, and settings." },
+            new ApplicationRole { Name = "Accountant", IsPlatformRole = false, Description = "Accounting, GST return, invoice, and report access." },
+            new ApplicationRole { Name = "Staff", IsPlatformRole = false, Description = "Limited day-to-day operational access." },
+            new ApplicationRole { Name = "Viewer", IsPlatformRole = false, Description = "Read-only dashboard and reporting access." }
         };
 
         foreach (var role in roles)
@@ -83,11 +86,18 @@ public static class DbSeeder
                 Email = DefaultAdminEmail,
                 EmailConfirmed = true,
                 FullName = "Super Admin",
-                IsActive = true
+                IsActive = true,
+                TenantId = null,
+                IsPlatformUser = true
             };
 
             await ThrowIfFailedAsync(userManager.CreateAsync(admin, "Admin@123"), $"create user '{DefaultAdminEmail}'");
         }
+
+        admin.TenantId = null;
+        admin.IsPlatformUser = true;
+        admin.IsActive = true;
+        await userManager.UpdateAsync(admin);
 
         if (!await userManager.IsInRoleAsync(admin, SuperAdminRole))
         {
@@ -95,6 +105,95 @@ public static class DbSeeder
         }
     }
 
+
+    private static async Task<int> SeedSaasDataAsync(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+    {
+        var plans = new[]
+        {
+            new SubscriptionPlan { PlanName = "Trial", Description = "14-day trial plan.", MonthlyPrice = 0, YearlyPrice = 0, MaxUsers = 2, MaxInvoicesPerMonth = 20, MaxCompanies = 1, IsActive = true },
+            new SubscriptionPlan { PlanName = "Basic", Description = "Starter GST billing plan.", MonthlyPrice = 999, YearlyPrice = 9999, MaxUsers = 5, MaxInvoicesPerMonth = 200, MaxCompanies = 1, IsActive = true },
+            new SubscriptionPlan { PlanName = "Professional", Description = "Full GST compliance plan for growing businesses.", MonthlyPrice = 2499, YearlyPrice = 24999, MaxUsers = 15, MaxInvoicesPerMonth = 1000, MaxCompanies = 1, HasEInvoice = true, HasEWayBill = true, HasGstReconciliation = true, HasAdvancedReports = true, IsActive = true },
+            new SubscriptionPlan { PlanName = "Enterprise", Description = "High-volume plan with all SaaS GST features.", MonthlyPrice = 9999, YearlyPrice = 99999, MaxUsers = 0, MaxInvoicesPerMonth = 0, MaxCompanies = 25, HasEInvoice = true, HasEWayBill = true, HasGstReconciliation = true, HasGstApiIntegration = true, HasAdvancedReports = true, IsActive = true }
+        };
+
+        foreach (var plan in plans)
+        {
+            if (!await db.SubscriptionPlans.IgnoreQueryFilters().AnyAsync(x => x.PlanName == plan.PlanName))
+            {
+                db.SubscriptionPlans.Add(plan);
+            }
+        }
+        await db.SaveChangesAsync();
+
+        var professionalPlan = await db.SubscriptionPlans.IgnoreQueryFilters().FirstAsync(x => x.PlanName == "Professional");
+        var tenant = await db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == "info@demogstcompany.com");
+        if (tenant is null)
+        {
+            tenant = new Tenant
+            {
+                TenantName = "demo-gst-company",
+                BusinessName = "Demo GST Company",
+                GSTIN = "24ABCDE1234F1Z5",
+                PANNumber = "ABCDE1234F",
+                ContactPersonName = "Demo Tenant Admin",
+                Email = "info@demogstcompany.com",
+                PhoneNumber = "9876543210",
+                Address = "101, Business Plaza, Ring Road",
+                State = "Gujarat",
+                City = "Surat",
+                Pincode = "395003",
+                Subdomain = "demo",
+                IsActive = true,
+                IsTrial = false,
+                SubscriptionPlanId = professionalPlan.Id,
+                SubscriptionStartDate = DateTime.UtcNow.Date,
+                SubscriptionEndDate = DateTime.UtcNow.Date.AddYears(1),
+                CreatedBy = "Seed"
+            };
+            db.Tenants.Add(tenant);
+            await db.SaveChangesAsync();
+        }
+
+        if (!await db.TenantSubscriptions.IgnoreQueryFilters().AnyAsync(x => x.TenantId == tenant.Id && x.SubscriptionPlanId == professionalPlan.Id && x.Status == "Active"))
+        {
+            db.TenantSubscriptions.Add(new TenantSubscription
+            {
+                TenantId = tenant.Id,
+                SubscriptionPlanId = professionalPlan.Id,
+                StartDate = tenant.SubscriptionStartDate ?? DateTime.UtcNow.Date,
+                EndDate = tenant.SubscriptionEndDate ?? DateTime.UtcNow.Date.AddYears(1),
+                BillingCycle = "Yearly",
+                Amount = professionalPlan.YearlyPrice,
+                Status = "Active",
+                PaymentStatus = "Paid",
+                PaymentReferenceNumber = "SEED-PRO-001"
+            });
+            await db.SaveChangesAsync();
+        }
+
+        var tenantAdmin = await userManager.FindByEmailAsync("tenantadmin@gstsoftware.com");
+        if (tenantAdmin is null)
+        {
+            tenantAdmin = new ApplicationUser
+            {
+                TenantId = tenant.Id,
+                UserName = "tenantadmin@gstsoftware.com",
+                Email = "tenantadmin@gstsoftware.com",
+                FullName = "Demo Tenant Admin",
+                EmailConfirmed = true,
+                IsActive = true,
+                IsPlatformUser = false
+            };
+            await ThrowIfFailedAsync(userManager.CreateAsync(tenantAdmin, "Admin@123"), "create default tenant admin");
+        }
+
+        if (!await userManager.IsInRoleAsync(tenantAdmin, "Tenant Admin"))
+        {
+            await ThrowIfFailedAsync(userManager.AddToRoleAsync(tenantAdmin, "Tenant Admin"), "assign Tenant Admin role");
+        }
+
+        return tenant.Id;
+    }
 
     private static async Task SeedRolePermissionsAsync(ApplicationDbContext db, RoleManager<ApplicationRole> roleManager)
     {
@@ -128,6 +227,7 @@ public static class DbSeeder
             case PermissionCatalog.SuperAdminRole:
                 SetAll(permission, true);
                 break;
+            case "Tenant Admin":
             case "Admin":
                 SetAll(permission, allBusinessModules.Contains(permission.ModuleName));
                 if (permission.ModuleName is "User Management" or "Role Management")
@@ -168,7 +268,7 @@ public static class DbSeeder
         permission.CanApprove = value;
     }
 
-    private static async Task SeedMasterDataAsync(ApplicationDbContext db)
+    private static async Task SeedMasterDataAsync(ApplicationDbContext db, int demoTenantId)
     {
         await SeedCompanyProfileAsync(db);
         await SeedGstRatesAsync(db);
@@ -180,6 +280,11 @@ public static class DbSeeder
         await SeedServicesAsync(db);
         await SeedAppSettingsAsync(db);
         await SeedGstApiCredentialAsync(db);
+
+        foreach (var entry in db.ChangeTracker.Entries<TenantEntity>().Where(e => e.Entity.TenantId == 0))
+        {
+            entry.Entity.TenantId = demoTenantId;
+        }
 
         await db.SaveChangesAsync();
     }
