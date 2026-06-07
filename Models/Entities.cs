@@ -236,6 +236,7 @@ public class SalesInvoice : AuditableEntity
     public string? TermsAndConditions { get; set; }
     public string EInvoiceStatus { get; set; } = "Pending"; public string? IRNNumber { get; set; }
     public string? QRCode { get; set; }
+    public string? FinancialYear { get; set; }
     public string EWayBillStatus { get; set; } = "Pending"; public string? EWayBillNumber { get; set; }
     public List<SalesInvoiceItem> Items { get; set; } = [];
 }
@@ -465,10 +466,13 @@ public class GstReconciliationItem : AuditableEntity
 }
 public class AuditLog : AuditableEntity
 {
-    public string ActionType { get; set; } = string.Empty; public string EntityName { get; set; } = string.Empty; public string EntityId { get; set; } = string.Empty; public string? OldValue { get; set; }
+    public string ActionType { get; set; } = string.Empty;
+    public string EntityName { get; set; } = string.Empty; 
+    public string EntityId { get; set; } = string.Empty; 
+    public string? OldValue { get; set; }
     public string? NewValue { get; set; }
     public string? UserId { get; set; }
-    public string ModuleName { get; set; } = string.Empty;
+    public string? ModuleName { get; set; }
     public string? Description { get; set; }
     public string? IpAddress { get; set; }
 }

@@ -4,6 +4,7 @@ using AdvancedGSTApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdvancedGSTApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260604075056_UserManagementAdded")]
+    partial class UserManagementAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,7 +67,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppSettings", (string)null);
+                    b.ToTable("AppSettings");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.ApplicationRole", b =>
@@ -254,7 +257,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditLogs", (string)null);
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.CompanyProfile", b =>
@@ -359,7 +362,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CompanyProfiles", (string)null);
+                    b.ToTable("CompanyProfiles");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.CreditNote", b =>
@@ -434,7 +437,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CreditNotes", (string)null);
+                    b.ToTable("CreditNotes");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.Customer", b =>
@@ -513,7 +516,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.DebitNote", b =>
@@ -588,7 +591,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DebitNotes", (string)null);
+                    b.ToTable("DebitNotes");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.EInvoice", b =>
@@ -647,7 +650,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EInvoices", (string)null);
+                    b.ToTable("EInvoices");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.EWayBill", b =>
@@ -715,7 +718,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EWayBills", (string)null);
+                    b.ToTable("EWayBills");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.Expense", b =>
@@ -797,7 +800,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Expenses", (string)null);
+                    b.ToTable("Expenses");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstApiCredential", b =>
@@ -861,7 +864,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstApiCredentials", (string)null);
+                    b.ToTable("GstApiCredentials");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstApiRequestLog", b =>
@@ -922,7 +925,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstApiRequestLogs", (string)null);
+                    b.ToTable("GstApiRequestLogs");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstApiResponseLog", b =>
@@ -984,7 +987,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstApiResponseLogs", (string)null);
+                    b.ToTable("GstApiResponseLogs");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstChallan", b =>
@@ -1067,7 +1070,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstChallans", (string)null);
+                    b.ToTable("GstChallans");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstLiabilityLedger", b =>
@@ -1148,7 +1151,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstLiabilityLedgers", (string)null);
+                    b.ToTable("GstLiabilityLedgers");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstPayment", b =>
@@ -1207,7 +1210,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstPayments", (string)null);
+                    b.ToTable("GstPayments");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstPaymentLedger", b =>
@@ -1288,7 +1291,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstPaymentLedgers", (string)null);
+                    b.ToTable("GstPaymentLedgers");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstRate", b =>
@@ -1333,7 +1336,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstRates", (string)null);
+                    b.ToTable("GstRates");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstReconciliation", b =>
@@ -1382,7 +1385,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstReconciliations", (string)null);
+                    b.ToTable("GstReconciliations");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstReconciliationItem", b =>
@@ -1443,7 +1446,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasIndex("GstReconciliationId");
 
-                    b.ToTable("GstReconciliationItems", (string)null);
+                    b.ToTable("GstReconciliationItems");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstReturnFiling", b =>
@@ -1524,7 +1527,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstReturnFilings", (string)null);
+                    b.ToTable("GstReturnFilings");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.GstReturnStatus", b =>
@@ -1571,7 +1574,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GstReturnStatuses", (string)null);
+                    b.ToTable("GstReturnStatuses");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.HsnSacCode", b =>
@@ -1624,7 +1627,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("HsnSacCodes", (string)null);
+                    b.ToTable("HsnSacCodes");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.InputTaxCreditLedger", b =>
@@ -1705,7 +1708,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InputTaxCreditLedgers", (string)null);
+                    b.ToTable("InputTaxCreditLedgers");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.InvoiceSeries", b =>
@@ -1756,7 +1759,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvoiceSeries", (string)null);
+                    b.ToTable("InvoiceSeries");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.OutputTaxLedger", b =>
@@ -1837,7 +1840,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OutputTaxLedgers", (string)null);
+                    b.ToTable("OutputTaxLedgers");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.Payment", b =>
@@ -1895,7 +1898,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.Product", b =>
@@ -1968,7 +1971,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.PurchaseInvoice", b =>
@@ -2053,7 +2056,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("PurchaseInvoices", (string)null);
+                    b.ToTable("PurchaseInvoices");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.PurchaseInvoiceItem", b =>
@@ -2137,7 +2140,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasIndex("PurchaseInvoiceId");
 
-                    b.ToTable("PurchaseInvoiceItems", (string)null);
+                    b.ToTable("PurchaseInvoiceItems");
 
                     b.HasDiscriminator().HasValue("PurchaseInvoiceItem");
 
@@ -2199,7 +2202,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Receipts", (string)null);
+                    b.ToTable("Receipts");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.RolePermission", b =>
@@ -2257,7 +2260,7 @@ namespace AdvancedGSTApp.Migrations
                     b.HasIndex("RoleId", "ModuleName")
                         .IsUnique();
 
-                    b.ToTable("RolePermissions", (string)null);
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.SalesInvoice", b =>
@@ -2377,7 +2380,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("SalesInvoices", (string)null);
+                    b.ToTable("SalesInvoices");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.SalesInvoiceItem", b =>
@@ -2495,7 +2498,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasIndex("SalesInvoiceId");
 
-                    b.ToTable("SalesInvoiceItems", (string)null);
+                    b.ToTable("SalesInvoiceItems");
 
                     b.HasDiscriminator().HasValue("SalesInvoiceItem");
 
@@ -2552,7 +2555,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ServiceItems", (string)null);
+                    b.ToTable("ServiceItems");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.Supplier", b =>
@@ -2627,7 +2630,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
