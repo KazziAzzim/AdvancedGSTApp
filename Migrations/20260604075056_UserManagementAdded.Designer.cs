@@ -4,6 +4,7 @@ using AdvancedGSTApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdvancedGSTApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260604075056_UserManagementAdded")]
+    partial class UserManagementAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,9 +55,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -66,8 +66,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("AppSettings");
                 });
@@ -91,9 +89,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPlatformRole")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -101,9 +96,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<int?>("TenantId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
@@ -114,8 +106,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("AspNetRoles", (string)null);
                 });
@@ -148,9 +138,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPlatformUser")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("LastLoginDate")
@@ -186,9 +173,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -208,8 +192,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -264,9 +246,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<string>("OldValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -277,8 +256,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("AuditLogs");
                 });
@@ -373,9 +350,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("TermsAndConditions")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -387,8 +361,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("CompanyProfiles");
                 });
@@ -457,9 +429,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -467,8 +436,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("CreditNotes");
                 });
@@ -511,7 +478,7 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GSTIN")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -541,9 +508,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -551,10 +515,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "GSTIN");
 
                     b.ToTable("Customers");
                 });
@@ -623,9 +583,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -633,8 +590,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("DebitNotes");
                 });
@@ -687,9 +642,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -697,8 +649,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("EInvoices");
                 });
@@ -745,9 +695,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("TransporterGSTIN")
                         .HasColumnType("nvarchar(max)");
 
@@ -770,8 +717,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("EWayBills");
                 });
@@ -839,9 +784,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("TotalAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -857,8 +799,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Expenses");
                 });
@@ -913,9 +853,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -926,8 +863,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstApiCredentials");
                 });
@@ -982,9 +917,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<int>("RetryCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -992,8 +924,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstApiRequestLogs");
                 });
@@ -1049,9 +979,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<bool>("Success")
                         .HasColumnType("bit");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1059,8 +986,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstApiResponseLogs");
                 });
@@ -1133,9 +1058,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("TotalAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -1147,8 +1069,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstChallans");
                 });
@@ -1220,9 +1140,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
@@ -1233,8 +1150,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstLiabilityLedgers");
                 });
@@ -1287,9 +1202,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1297,8 +1209,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstPayments");
                 });
@@ -1370,9 +1280,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
@@ -1383,8 +1290,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstPaymentLedgers");
                 });
@@ -1423,9 +1328,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1433,8 +1335,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstRates");
                 });
@@ -1470,9 +1370,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1487,8 +1384,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstReconciliations");
                 });
@@ -1541,9 +1436,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1553,8 +1445,6 @@ namespace AdvancedGSTApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GstReconciliationId");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstReconciliationItems");
                 });
@@ -1625,9 +1515,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("TotalTaxAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -1639,8 +1526,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstReturnFilings");
                 });
@@ -1681,9 +1566,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -1691,8 +1573,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("GstReturnStatuses");
                 });
@@ -1735,9 +1615,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1749,8 +1626,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("HsnSacCodes");
                 });
@@ -1822,9 +1697,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
@@ -1835,8 +1707,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("InputTaxCreditLedgers");
                 });
@@ -1866,7 +1736,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.Property<string>("FinancialYear")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -1876,12 +1746,9 @@ namespace AdvancedGSTApp.Migrations
 
                     b.Property<string>("Prefix")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StartingNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TenantId")
                         .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
@@ -1891,11 +1758,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "Prefix", "FinancialYear")
-                        .IsUnique();
 
                     b.ToTable("InvoiceSeries");
                 });
@@ -1967,9 +1829,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
 
@@ -1980,8 +1839,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("OutputTaxLedgers");
                 });
@@ -2033,9 +1890,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2043,8 +1897,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Payments");
                 });
@@ -2093,7 +1945,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.Property<string>("ProductCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
@@ -2107,9 +1959,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Unit")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2121,11 +1970,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "ProductCode")
-                        .IsUnique();
 
                     b.ToTable("Products");
                 });
@@ -2198,9 +2042,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("TotalGSTAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -2214,8 +2055,6 @@ namespace AdvancedGSTApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SupplierId");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("PurchaseInvoices");
                 });
@@ -2291,9 +2130,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2303,8 +2139,6 @@ namespace AdvancedGSTApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PurchaseInvoiceId");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("PurchaseInvoiceItems");
 
@@ -2360,9 +2194,6 @@ namespace AdvancedGSTApp.Migrations
                     b.Property<int?>("ReferenceInvoiceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2370,8 +2201,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("Receipts");
                 });
@@ -2423,78 +2252,15 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("RoleId", "ModuleName", "TenantId")
-                        .IsUnique()
-                        .HasFilter("[TenantId] IS NOT NULL");
-
-                    b.ToTable("RolePermissions");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.SaasPayment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InvoiceNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SubscriptionPlanId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TenantSubscriptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TransactionReference")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubscriptionPlanId");
-
-                    b.HasIndex("TenantSubscriptionId");
-
-                    b.HasIndex("TenantId", "InvoiceNumber")
+                    b.HasIndex("RoleId", "ModuleName")
                         .IsUnique();
 
-                    b.ToTable("SaasPayments");
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.SalesInvoice", b =>
@@ -2547,9 +2313,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FinancialYear")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<decimal>("GrandTotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -2566,7 +2329,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.Property<string>("InvoiceNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -2600,9 +2363,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("TermsAndConditions")
                         .HasColumnType("nvarchar(max)");
 
@@ -2619,12 +2379,6 @@ namespace AdvancedGSTApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "InvoiceNumber", "FinancialYear")
-                        .IsUnique()
-                        .HasFilter("[FinancialYear] IS NOT NULL");
 
                     b.ToTable("SalesInvoices");
                 });
@@ -2730,9 +2484,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Unit")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -2746,8 +2497,6 @@ namespace AdvancedGSTApp.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SalesInvoiceId");
-
-                    b.HasIndex("TenantId");
 
                     b.ToTable("SalesInvoiceItems");
 
@@ -2798,9 +2547,6 @@ namespace AdvancedGSTApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2809,75 +2555,7 @@ namespace AdvancedGSTApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId");
-
                     b.ToTable("ServiceItems");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.SubscriptionPlan", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("HasAdvancedReports")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasEInvoice")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasEWayBill")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasGstApiIntegration")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasGstReconciliation")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MaxCompanies")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaxInvoicesPerMonth")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaxUsers")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("MonthlyPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PlanName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("YearlyPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlanName")
-                        .IsUnique();
-
-                    b.ToTable("SubscriptionPlans");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.Supplier", b =>
@@ -2913,7 +2591,7 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GSTIN")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -2944,9 +2622,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -2954,179 +2629,8 @@ namespace AdvancedGSTApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("TenantId", "GSTIN");
 
                     b.ToTable("Suppliers");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Tenant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BusinessName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactPersonName")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DatabaseName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("GSTIN")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTrial")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LogoPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PANNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pincode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Subdomain")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("SubscriptionEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("SubscriptionPlanId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("SubscriptionStartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TenantName")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime?>("TrialEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TrialStartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("GSTIN")
-                        .IsUnique();
-
-                    b.HasIndex("SubscriptionPlanId");
-
-                    b.ToTable("Tenants");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.TenantSubscription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("BillingCycle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentReferenceNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("SubscriptionPlanId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubscriptionPlanId");
-
-                    b.HasIndex("TenantId", "Status");
-
-                    b.ToTable("TenantSubscriptions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -3259,224 +2763,6 @@ namespace AdvancedGSTApp.Migrations
                     b.HasDiscriminator().HasValue("CreditNoteItem");
                 });
 
-            modelBuilder.Entity("AdvancedGSTApp.Models.AppSetting", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.ApplicationRole", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.AuditLog", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.CompanyProfile", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.CreditNote", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Customer", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.DebitNote", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.EInvoice", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.EWayBill", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Expense", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstApiCredential", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstApiRequestLog", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstApiResponseLog", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstChallan", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstLiabilityLedger", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstPayment", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstPaymentLedger", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstRate", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstReconciliation", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("AdvancedGSTApp.Models.GstReconciliationItem", b =>
                 {
                     b.HasOne("AdvancedGSTApp.Models.GstReconciliation", null)
@@ -3484,102 +2770,6 @@ namespace AdvancedGSTApp.Migrations
                         .HasForeignKey("GstReconciliationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstReturnFiling", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.GstReturnStatus", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.HsnSacCode", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.InputTaxCreditLedger", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.InvoiceSeries", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.OutputTaxLedger", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Payment", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Product", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.PurchaseInvoice", b =>
@@ -3590,15 +2780,7 @@ namespace AdvancedGSTApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Supplier");
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.PurchaseInvoiceItem", b =>
@@ -3609,26 +2791,7 @@ namespace AdvancedGSTApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("PurchaseInvoice");
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Receipt", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.RolePermission", b =>
@@ -3639,38 +2802,7 @@ namespace AdvancedGSTApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId");
-
                     b.Navigation("Role");
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.SaasPayment", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.SubscriptionPlan", "SubscriptionPlan")
-                        .WithMany()
-                        .HasForeignKey("SubscriptionPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AdvancedGSTApp.Models.TenantSubscription", "TenantSubscription")
-                        .WithMany()
-                        .HasForeignKey("TenantSubscriptionId");
-
-                    b.Navigation("SubscriptionPlan");
-
-                    b.Navigation("Tenant");
-
-                    b.Navigation("TenantSubscription");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.SalesInvoice", b =>
@@ -3681,15 +2813,7 @@ namespace AdvancedGSTApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Customer");
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("AdvancedGSTApp.Models.SalesInvoiceItem", b =>
@@ -3700,65 +2824,7 @@ namespace AdvancedGSTApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("SalesInvoice");
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.ServiceItem", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Supplier", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.Tenant", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.SubscriptionPlan", "SubscriptionPlan")
-                        .WithMany()
-                        .HasForeignKey("SubscriptionPlanId");
-
-                    b.Navigation("SubscriptionPlan");
-                });
-
-            modelBuilder.Entity("AdvancedGSTApp.Models.TenantSubscription", b =>
-                {
-                    b.HasOne("AdvancedGSTApp.Models.SubscriptionPlan", "SubscriptionPlan")
-                        .WithMany()
-                        .HasForeignKey("SubscriptionPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AdvancedGSTApp.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SubscriptionPlan");
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

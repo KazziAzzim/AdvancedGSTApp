@@ -4,6 +4,7 @@ using AdvancedGSTApp.Repositories;
 using AdvancedGSTApp.Repositories.Interfaces;
 using AdvancedGSTApp.Services;
 using AdvancedGSTApp.Services.Interfaces;
+using AdvancedGSTApp.Services.SaaS;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -28,6 +30,11 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantContext, TenantContext>();
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<ITenantAccessService, TenantAccessService>();
 builder.Services.Configure<GstApiOptions>(builder.Configuration.GetSection("GstApi"));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
@@ -73,5 +80,7 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(scope.ServiceProvider);
 }
 
+app.MapControllerRoute(name: "superadmin", pattern: "SuperAdmin/{controller=SuperAdminDashboard}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "dashboard", pattern: "Dashboard", defaults: new { controller = "TenantDashboard", action = "Index" });
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();

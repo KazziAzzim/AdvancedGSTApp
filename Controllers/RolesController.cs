@@ -164,7 +164,16 @@ public class RolesController(
     private void AddIdentityErrors(IdentityResult result) { foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description); }
     private async Task AddAuditAsync(string action, string entityId, string description)
     {
-        db.AuditLogs.Add(new AuditLog { ActionType = action, EntityName = "Role Management", EntityId = entityId, ModuleName = "Role Management", Description = description, UserId = User.FindFirstValue(ClaimTypes.NameIdentifier), IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() });
+        db.AuditLogs.Add(new AuditLog
+        {
+            ActionType = action,
+            EntityName = "Role Management",
+            EntityId = entityId,
+            ModuleName = "Role Management",
+            Description = description,
+            UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
         await db.SaveChangesAsync();
     }
 }

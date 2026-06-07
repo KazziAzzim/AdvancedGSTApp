@@ -1,0 +1,18 @@
+@model CreateTenantViewModel
+<form method="post" class="card form-card"><div class="card-body row g-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @if (Model is EditTenantViewModel editModel) { <input type="hidden" name="Id" value="@editModel.Id" /> }
+    <div class="col-md-6"><label asp-for="BusinessName" class="form-label"></label><input asp-for="BusinessName" class="form-control" /><span asp-validation-for="BusinessName" class="text-danger"></span></div>
+    <div class="col-md-3"><label asp-for="GSTIN" class="form-label"></label><input asp-for="GSTIN" class="form-control text-uppercase" /></div>
+    <div class="col-md-3"><label asp-for="PANNumber" class="form-label"></label><input asp-for="PANNumber" class="form-control text-uppercase" /></div>
+    <div class="col-md-4"><label asp-for="ContactPersonName" class="form-label"></label><input asp-for="ContactPersonName" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="PhoneNumber" class="form-label"></label><input asp-for="PhoneNumber" class="form-control" /></div>
+    <div class="col-12"><label asp-for="Address" class="form-label"></label><textarea asp-for="Address" class="form-control"></textarea></div>
+    <div class="col-md-4"><label asp-for="State" class="form-label"></label><input asp-for="State" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="City" class="form-label"></label><input asp-for="City" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="Pincode" class="form-label"></label><input asp-for="Pincode" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="Subdomain" class="form-label"></label><input asp-for="Subdomain" class="form-control" /></div>
+    @if (Model is not EditTenantViewModel) { <div class="col-md-4"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control" /></div><div class="col-md-4"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control" /></div> }
+    @if (Model is EditTenantViewModel e) { <div class="col-md-3 form-check mt-4"><input class="form-check-input" type="checkbox" name="IsActive" value="true" checked="@e.IsActive" /><label class="form-check-label">Active</label></div><div class="col-md-3 form-check mt-4"><input class="form-check-input" type="checkbox" name="IsTrial" value="true" checked="@e.IsTrial" /><label class="form-check-label">Trial</label></div> }
+</div><div class="card-footer"><button class="btn btn-primary">Save</button> <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a></div></form>

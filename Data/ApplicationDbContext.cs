@@ -1,11 +1,27 @@
 using AdvancedGSTApp.Models;
+using AdvancedGSTApp.Services.Interfaces;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace AdvancedGSTApp.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
 {
+    private readonly ITenantContext? tenantContext;
+
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ITenantContext? tenantContext = null) : base(options)
+    {
+        this.tenantContext = tenantContext;
+    }
+
+    public int? CurrentTenantId => tenantContext?.TenantId;
+    public bool IsTenantFilterDisabled => tenantContext is null || tenantContext.IsSuperAdmin || !tenantContext.HasTenant;
+
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+    public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
+    public DbSet<SaasPayment> SaasPayments => Set<SaasPayment>();
     public DbSet<CompanyProfile> CompanyProfiles => Set<CompanyProfile>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -48,97 +64,111 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(builder);
 
-        foreach (var entityType in builder.Model.GetEntityTypes()
-        .Where(e =>
-        typeof(AuditableEntity).IsAssignableFrom(e.ClrType)
-        && e.BaseType == null
-        && !e.IsOwned()))
+        foreach (var entityType in builder.Model.GetEntityTypes().Where(e => typeof(ITenantEntity).IsAssignableFrom(e.ClrType) && e.BaseType == null && !e.IsOwned()))
         {
-            builder.Entity(entityType.ClrType)
-                .HasQueryFilter(CreateSoftDeleteFilter(entityType.ClrType));
+            builder.Entity(entityType.ClrType).HasQueryFilter(CreateTenantFilter(entityType.ClrType));
+            builder.Entity(entityType.ClrType).HasIndex(nameof(ITenantEntity.TenantId));
         }
 
         foreach (var property in builder.Model.GetEntityTypes().SelectMany(t => t.GetProperties()).Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
         {
             property.SetPrecision(18); property.SetScale(2);
         }
-        ConfigureTenantDeleteBehavior(builder);
+
+        builder.Entity<Tenant>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Tenant>().HasIndex(x => x.Email).IsUnique();
+        builder.Entity<Tenant>().HasIndex(x => x.GSTIN).IsUnique();
+        builder.Entity<SubscriptionPlan>().HasIndex(x => x.PlanName).IsUnique();
+        builder.Entity<TenantSubscription>().HasIndex(x => new { x.TenantId, x.Status });
+        builder.Entity<SaasPayment>().HasIndex(x => new { x.TenantId, x.InvoiceNumber }).IsUnique();
+
+        builder.Entity<ApplicationUser>().HasOne(x => x.Tenant).WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<ApplicationRole>().HasOne(x => x.Tenant).WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<SalesInvoice>().HasMany(x => x.Items).WithOne(x => x.SalesInvoice).HasForeignKey(x => x.SalesInvoiceId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<PurchaseInvoice>().HasMany(x => x.Items).WithOne(x => x.PurchaseInvoice).HasForeignKey(x => x.PurchaseInvoiceId).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<RolePermission>().HasIndex(x => new { x.RoleId, x.ModuleName }).IsUnique();
+        builder.Entity<RolePermission>().HasIndex(x => new { x.RoleId, x.ModuleName, x.TenantId }).IsUnique();
         builder.Entity<RolePermission>().HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Customer>().HasIndex(x => new { x.TenantId, x.GSTIN });
+        builder.Entity<Supplier>().HasIndex(x => new { x.TenantId, x.GSTIN });
+        builder.Entity<Product>().HasIndex(x => new { x.TenantId, x.ProductCode }).IsUnique();
+        builder.Entity<InvoiceSeries>().HasIndex(x => new { x.TenantId, x.Prefix, x.FinancialYear }).IsUnique();
+        builder.Entity<SalesInvoice>().HasIndex(x => new { x.TenantId, x.InvoiceNumber, x.FinancialYear }).IsUnique();
     }
 
-    private static void ConfigureTenantDeleteBehavior(ModelBuilder builder)
+    public override int SaveChanges()
     {
-        var tenantType = builder.Model.GetEntityTypes()
-            .FirstOrDefault(entityType => entityType.ClrType.Name == "Tenant")
-            ?.ClrType;
+        ApplyTenantAndAuditRules();
+        return base.SaveChanges();
+    }
 
-        if (tenantType is null)
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ApplyTenantAndAuditRules();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private LambdaExpression CreateTenantFilter(Type entityType)
+    {
+        var parameter = Expression.Parameter(entityType, "e");
+        var isDeleted = Expression.Equal(Expression.Property(parameter, nameof(TenantEntity.IsDeleted)), Expression.Constant(false));
+        var tenantId = Expression.Convert(Expression.Property(parameter, nameof(ITenantEntity.TenantId)), typeof(int?));
+        var currentTenant = Expression.Property(Expression.Constant(this), nameof(CurrentTenantId));
+        var filterDisabled = Expression.Property(Expression.Constant(this), nameof(IsTenantFilterDisabled));
+        var tenantMatches = Expression.Equal(tenantId, currentTenant);
+        var tenantCondition = Expression.OrElse(filterDisabled, tenantMatches);
+        return Expression.Lambda(Expression.AndAlso(isDeleted, tenantCondition), parameter);
+    }
+
+    private void ApplyTenantAndAuditRules()
+    {
+        var tenantId = tenantContext?.TenantId;
+        var isSuperAdmin = tenantContext?.IsSuperAdmin == true;
+        var now = DateTime.UtcNow;
+
+        foreach (var entry in ChangeTracker.Entries<TenantEntity>())
         {
-            return;
-        }
-
-        foreach (var entityType in builder.Model.GetEntityTypes()
-            .Where(entityType => typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
-            .ToList())
-        {
-            var tenantForeignKey = entityType.GetForeignKeys()
-                .FirstOrDefault(foreignKey =>
-                    foreignKey.PrincipalEntityType.ClrType == tenantType
-                    && foreignKey.Properties.Any(property => property.Name == nameof(ITenantEntity.TenantId)));
-
-            if (tenantForeignKey is not null)
+            if (entry.State == EntityState.Added)
             {
-                tenantForeignKey.DeleteBehavior = DeleteBehavior.NoAction;
-                continue;
+                if (!isSuperAdmin && tenantId.HasValue)
+                {
+                    if (entry.Entity.TenantId != 0 && entry.Entity.TenantId != tenantId.Value)
+                    {
+                        throw new InvalidOperationException("Tenant users cannot create data for another tenant.");
+                    }
+
+                    entry.Entity.TenantId = tenantId.Value;
+                }
+
+                if (entry.Entity.TenantId == 0 && tenantId.HasValue)
+                {
+                    entry.Entity.TenantId = tenantId.Value;
+                }
+                else if (entry.Entity.TenantId == 0 && tenantContext is not null)
+                {
+                    entry.Entity.TenantId = Tenants.IgnoreQueryFilters().OrderBy(x => x.Id).Select(x => x.Id).FirstOrDefault();
+                }
+
+                entry.Entity.CreatedDate = now;
             }
 
-            builder.Entity(entityType.ClrType)
-                .HasOne(tenantType, null)
-                .WithMany()
-                .HasForeignKey(nameof(ITenantEntity.TenantId))
-                .OnDelete(DeleteBehavior.NoAction);
+            if (entry.State == EntityState.Modified)
+            {
+                if (!isSuperAdmin && tenantId.HasValue && entry.Entity.TenantId != tenantId.Value)
+                {
+                    throw new InvalidOperationException("Tenant users cannot modify data for another tenant.");
+                }
+
+                entry.Property(x => x.TenantId).IsModified = false;
+                entry.Entity.UpdatedDate = now;
+            }
+
+            if (entry.State == EntityState.Deleted)
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+                entry.Entity.UpdatedDate = now;
+            }
         }
-
-        ConfigureIdentityTenantDeleteBehavior<ApplicationUser>(builder, tenantType);
-        ConfigureIdentityTenantDeleteBehavior<ApplicationRole>(builder, tenantType);
-    }
-
-    private static void ConfigureIdentityTenantDeleteBehavior<TIdentityEntity>(ModelBuilder builder, Type tenantType)
-        where TIdentityEntity : class
-    {
-        var entityType = builder.Model.FindEntityType(typeof(TIdentityEntity));
-        if (entityType?.FindProperty(nameof(ITenantEntity.TenantId)) is null)
-        {
-            return;
-        }
-
-        var tenantForeignKey = entityType.GetForeignKeys()
-            .FirstOrDefault(foreignKey =>
-                foreignKey.PrincipalEntityType.ClrType == tenantType
-                && foreignKey.Properties.Any(property => property.Name == nameof(ITenantEntity.TenantId)));
-
-        if (tenantForeignKey is not null)
-        {
-            tenantForeignKey.DeleteBehavior = DeleteBehavior.Restrict;
-            return;
-        }
-
-        builder.Entity<TIdentityEntity>()
-            .HasOne(tenantType, null)
-            .WithMany()
-            .HasForeignKey(nameof(ITenantEntity.TenantId))
-            .OnDelete(DeleteBehavior.Restrict);
-    }
-
-    private static System.Linq.Expressions.LambdaExpression CreateSoftDeleteFilter(Type entityType)
-    {
-        var parameter = System.Linq.Expressions.Expression.Parameter(entityType, "e");
-        var property = System.Linq.Expressions.Expression.Property(parameter, nameof(AuditableEntity.IsDeleted));
-        var condition = System.Linq.Expressions.Expression.Equal(property, System.Linq.Expressions.Expression.Constant(false));
-        return System.Linq.Expressions.Expression.Lambda(condition, parameter);
     }
 }
