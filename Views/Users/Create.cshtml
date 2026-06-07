@@ -1,0 +1,14 @@
+@model CreateUserViewModel
+@{ ViewData["Title"] = "Create User"; }
+<div class="d-flex justify-content-between mb-4"><div><h1 class="h3">Create User</h1><p class="text-muted">Add a staff account and assign an active role.</p></div><a asp-action="Index" class="btn btn-outline-secondary">Back</a></div>
+<form asp-action="Create" method="post" class="card border-0 shadow-sm"><div class="card-body row g-3">
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="col-md-6"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control"/><span asp-validation-for="FullName" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control"/><span asp-validation-for="Email" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="UserName" class="form-label"></label><input asp-for="UserName" class="form-control"/><span asp-validation-for="UserName" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="PhoneNumber" class="form-label"></label><input asp-for="PhoneNumber" class="form-control"/></div>
+<div class="col-md-6"><label asp-for="Password" class="form-label"></label><input asp-for="Password" class="form-control"/><span asp-validation-for="Password" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="ConfirmPassword" class="form-label"></label><input asp-for="ConfirmPassword" class="form-control"/><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="RoleId" class="form-label">Role</label><select asp-for="RoleId" asp-items="Model.Roles" class="form-select"><option value="">Select role</option></select><span asp-validation-for="RoleId" class="text-danger"></span></div>
+<div class="col-md-6 d-flex align-items-end"><div class="form-check form-switch"><input asp-for="IsActive" class="form-check-input"/><label asp-for="IsActive" class="form-check-label"></label></div></div>
+</div><div class="card-footer bg-white text-end"><button class="btn btn-primary"><i class="bi bi-save"></i> Save User</button></div></form>

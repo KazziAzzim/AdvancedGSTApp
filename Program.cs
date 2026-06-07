@@ -31,6 +31,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.Configure<GstApiOptions>(builder.Configuration.GetSection("GstApi"));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IGstCalculationService, GstCalculationService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();

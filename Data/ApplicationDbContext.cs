@@ -41,6 +41,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<GstReconciliation> GstReconciliations => Set<GstReconciliation>();
     public DbSet<GstReconciliationItem> GstReconciliationItems => Set<GstReconciliationItem>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
     public DbSet<AppSetting> AppSettings => Set<AppSetting>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -61,8 +62,76 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             property.SetPrecision(18); property.SetScale(2);
         }
+        ConfigureTenantDeleteBehavior(builder);
+
         builder.Entity<SalesInvoice>().HasMany(x => x.Items).WithOne(x => x.SalesInvoice).HasForeignKey(x => x.SalesInvoiceId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<PurchaseInvoice>().HasMany(x => x.Items).WithOne(x => x.PurchaseInvoice).HasForeignKey(x => x.PurchaseInvoiceId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<RolePermission>().HasIndex(x => new { x.RoleId, x.ModuleName }).IsUnique();
+        builder.Entity<RolePermission>().HasOne(x => x.Role).WithMany().HasForeignKey(x => x.RoleId).OnDelete(DeleteBehavior.Cascade);
+    }
+
+    private static void ConfigureTenantDeleteBehavior(ModelBuilder builder)
+    {
+        var tenantType = builder.Model.GetEntityTypes()
+            .FirstOrDefault(entityType => entityType.ClrType.Name == "Tenant")
+            ?.ClrType;
+
+        if (tenantType is null)
+        {
+            return;
+        }
+
+        foreach (var entityType in builder.Model.GetEntityTypes()
+            .Where(entityType => typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
+            .ToList())
+        {
+            var tenantForeignKey = entityType.GetForeignKeys()
+                .FirstOrDefault(foreignKey =>
+                    foreignKey.PrincipalEntityType.ClrType == tenantType
+                    && foreignKey.Properties.Any(property => property.Name == nameof(ITenantEntity.TenantId)));
+
+            if (tenantForeignKey is not null)
+            {
+                tenantForeignKey.DeleteBehavior = DeleteBehavior.NoAction;
+                continue;
+            }
+
+            builder.Entity(entityType.ClrType)
+                .HasOne(tenantType, null)
+                .WithMany()
+                .HasForeignKey(nameof(ITenantEntity.TenantId))
+                .OnDelete(DeleteBehavior.NoAction);
+        }
+
+        ConfigureIdentityTenantDeleteBehavior<ApplicationUser>(builder, tenantType);
+        ConfigureIdentityTenantDeleteBehavior<ApplicationRole>(builder, tenantType);
+    }
+
+    private static void ConfigureIdentityTenantDeleteBehavior<TIdentityEntity>(ModelBuilder builder, Type tenantType)
+        where TIdentityEntity : class
+    {
+        var entityType = builder.Model.FindEntityType(typeof(TIdentityEntity));
+        if (entityType?.FindProperty(nameof(ITenantEntity.TenantId)) is null)
+        {
+            return;
+        }
+
+        var tenantForeignKey = entityType.GetForeignKeys()
+            .FirstOrDefault(foreignKey =>
+                foreignKey.PrincipalEntityType.ClrType == tenantType
+                && foreignKey.Properties.Any(property => property.Name == nameof(ITenantEntity.TenantId)));
+
+        if (tenantForeignKey is not null)
+        {
+            tenantForeignKey.DeleteBehavior = DeleteBehavior.Restrict;
+            return;
+        }
+
+        builder.Entity<TIdentityEntity>()
+            .HasOne(tenantType, null)
+            .WithMany()
+            .HasForeignKey(nameof(ITenantEntity.TenantId))
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private static System.Linq.Expressions.LambdaExpression CreateSoftDeleteFilter(Type entityType)
