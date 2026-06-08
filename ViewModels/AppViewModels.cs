@@ -128,6 +128,69 @@ public class SalesInvoiceFormViewModel
     public string CompanyState { get; set; } = string.Empty;
 }
 
+
+public class TaxInvoicePrintViewModel
+{
+    public SalesInvoice Invoice { get; set; } = new();
+
+    public CompanyProfile? Company { get; set; }
+
+    public Customer? Customer { get; set; }
+
+    public EInvoice? EInvoice { get; set; }
+
+    public EWayBill? EWayBill { get; set; }
+
+    public List<SalesInvoiceItem> Items { get; set; } = [];
+
+    public List<TaxInvoiceGstSummaryRow> GstSummary { get; set; } = [];
+
+    public string AmountInWords { get; set; } = string.Empty;
+
+    public string CompanyStateCode => GetStateCode(Company?.GSTIN);
+
+    public string CustomerStateCode => GetStateCode(Customer?.GSTIN);
+
+    public string ShipToAddress => string.IsNullOrWhiteSpace(Invoice.ShippingAddress)
+        ? Invoice.BillingAddress
+        : Invoice.ShippingAddress;
+
+    public string TermsAndConditions => !string.IsNullOrWhiteSpace(Invoice.TermsAndConditions)
+        ? Invoice.TermsAndConditions
+        : Company?.TermsAndConditions ?? string.Empty;
+
+    public decimal TotalCgst => Items.Sum(x => x.CGSTAmount);
+
+    public decimal TotalSgst => Items.Sum(x => x.SGSTAmount);
+
+    public decimal TotalIgst => Items.Sum(x => x.IGSTAmount);
+
+    public decimal TotalGst => TotalCgst + TotalSgst + TotalIgst;
+
+    public decimal TotalDiscount => Items.Sum(x => x.DiscountAmount);
+
+    public bool HasEInvoice => EInvoice is not null || !string.IsNullOrWhiteSpace(Invoice.IRNNumber);
+
+    public bool HasEWayBill => EWayBill is not null || !string.IsNullOrWhiteSpace(Invoice.EWayBillNumber);
+
+    private static string GetStateCode(string? gstin) => !string.IsNullOrWhiteSpace(gstin) && gstin.Length >= 2 ? gstin[..2] : string.Empty;
+}
+
+public class TaxInvoiceGstSummaryRow
+{
+    public decimal GstRate { get; set; }
+
+    public decimal TaxableAmount { get; set; }
+
+    public decimal CgstAmount { get; set; }
+
+    public decimal SgstAmount { get; set; }
+
+    public decimal IgstAmount { get; set; }
+
+    public decimal TotalGst => CgstAmount + SgstAmount + IgstAmount;
+}
+
 public class TenantListViewModel
 {
     public List<Tenant> Tenants { get; set; } = [];

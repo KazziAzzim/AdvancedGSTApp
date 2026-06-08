@@ -5,6 +5,7 @@ using AdvancedGSTApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace AdvancedGSTApp.Controllers;
 
@@ -58,7 +59,69 @@ public class SalesInvoicesController(
     public async Task<IActionResult> Details(int id) => View(await invoices.GetByIdAsync(id));
 
     [PermissionAuthorize("Sales Invoice", "Print")]
-    public async Task<IActionResult> Print(int id) => View("Details", await invoices.GetByIdAsync(id));
+    public async Task<IActionResult> Print(int id)
+    {
+        var invoiceQuery = db.SalesInvoices
+            .Include(x => x.Customer)
+            .Include(x => x.Items)
+            .AsQueryable();
+
+        if (tenantContext.TenantId.HasValue)
+        {
+            invoiceQuery = invoiceQuery.Where(x => x.TenantId == tenantContext.TenantId.Value);
+        }
+
+        var invoice = await invoiceQuery.FirstOrDefaultAsync(x => x.Id == id);
+        if (invoice is null)
+        {
+            return NotFound();
+        }
+
+        var companyQuery = db.CompanyProfiles.Where(x => x.IsActive);
+        var eInvoiceQuery = db.EInvoices.Where(x => x.SalesInvoiceId == id);
+        var eWayBillQuery = db.EWayBills.Where(x => x.SalesInvoiceId == id);
+
+        if (tenantContext.TenantId.HasValue)
+        {
+            companyQuery = companyQuery.Where(x => x.TenantId == tenantContext.TenantId.Value);
+            eInvoiceQuery = eInvoiceQuery.Where(x => x.TenantId == tenantContext.TenantId.Value);
+            eWayBillQuery = eWayBillQuery.Where(x => x.TenantId == tenantContext.TenantId.Value);
+        }
+        else
+        {
+            companyQuery = companyQuery.Where(x => x.TenantId == invoice.TenantId);
+            eInvoiceQuery = eInvoiceQuery.Where(x => x.TenantId == invoice.TenantId);
+            eWayBillQuery = eWayBillQuery.Where(x => x.TenantId == invoice.TenantId);
+        }
+
+        var model = new TaxInvoicePrintViewModel
+        {
+            Invoice = invoice,
+            Company = await companyQuery.OrderByDescending(x => x.UpdatedDate ?? x.CreatedDate).FirstOrDefaultAsync(),
+            Customer = invoice.Customer,
+            Items = invoice.Items.OrderBy(x => x.Id).ToList(),
+            EInvoice = await eInvoiceQuery.OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(),
+            EWayBill = await eWayBillQuery.OrderByDescending(x => x.CreatedDate).FirstOrDefaultAsync(),
+            AmountInWords = string.IsNullOrWhiteSpace(invoice.AmountInWords)
+                ? ConvertToIndianCurrencyWords(invoice.GrandTotal)
+                : invoice.AmountInWords
+        };
+
+        model.GstSummary = model.Items
+            .GroupBy(x => x.GSTPercentage)
+            .Select(x => new TaxInvoiceGstSummaryRow
+            {
+                GstRate = x.Key,
+                TaxableAmount = x.Sum(i => i.TaxableAmount),
+                CgstAmount = x.Sum(i => i.CGSTAmount),
+                SgstAmount = x.Sum(i => i.SGSTAmount),
+                IgstAmount = x.Sum(i => i.IGSTAmount)
+            })
+            .OrderBy(x => x.GstRate)
+            .ToList();
+
+        return View(model);
+    }
 
     [PermissionAuthorize("Sales Invoice", "Export")]
     public async Task<IActionResult> DownloadPdf(int id) => File(await pdf.GenerateInvoicePdfAsync(id), "application/pdf", $"invoice-{id}.pdf");
@@ -133,4 +196,66 @@ public class SalesInvoicesController(
         Services = await db.ServiceItems.ToListAsync(),
         CompanyState = await db.CompanyProfiles.Select(x => x.State).FirstOrDefaultAsync() ?? string.Empty
     };
+
+    private static string ConvertToIndianCurrencyWords(decimal amount)
+    {
+        var rupees = (long)Math.Floor(amount);
+        var paise = (int)Math.Round((amount - rupees) * 100, MidpointRounding.AwayFromZero);
+
+        if (paise == 100)
+        {
+            rupees++;
+            paise = 0;
+        }
+
+        var words = new StringBuilder($"Rupees {ConvertNumberToWords(rupees)}");
+        if (paise > 0)
+        {
+            words.Append($" and {ConvertNumberToWords(paise)} Paise");
+        }
+
+        words.Append(" Only");
+        return words.ToString();
+    }
+
+    private static string ConvertNumberToWords(long number)
+    {
+        if (number == 0)
+        {
+            return "Zero";
+        }
+
+        string[] units = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+        string[] tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+        static string TwoDigitWords(long value, string[] unitWords, string[] tenWords)
+        {
+            if (value < 20)
+            {
+                return unitWords[(int)value];
+            }
+
+            return string.IsNullOrWhiteSpace(unitWords[(int)(value % 10)])
+                ? tenWords[(int)(value / 10)]
+                : $"{tenWords[(int)(value / 10)]} {unitWords[(int)(value % 10)]}";
+        }
+
+        var parts = new List<string>();
+        var crore = number / 10000000;
+        number %= 10000000;
+        var lakh = number / 100000;
+        number %= 100000;
+        var thousand = number / 1000;
+        number %= 1000;
+        var hundred = number / 100;
+        var remainder = number % 100;
+
+        if (crore > 0) parts.Add($"{ConvertNumberToWords(crore)} Crore");
+        if (lakh > 0) parts.Add($"{ConvertNumberToWords(lakh)} Lakh");
+        if (thousand > 0) parts.Add($"{ConvertNumberToWords(thousand)} Thousand");
+        if (hundred > 0) parts.Add($"{units[(int)hundred]} Hundred");
+        if (remainder > 0) parts.Add(TwoDigitWords(remainder, units, tens));
+
+        return string.Join(" ", parts);
+    }
 }

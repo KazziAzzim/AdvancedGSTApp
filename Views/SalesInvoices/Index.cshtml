@@ -27,7 +27,12 @@
                         <td>₹@invoice.TotalGSTAmount</td>
                         <td class="fw-bold">₹@invoice.GrandTotal</td>
                         <td><span class="badge bg-secondary">@invoice.EInvoiceStatus</span></td>
-                        <td class="text-end"><a class="btn btn-outline-primary btn-sm" asp-action="Details" asp-route-id="@invoice.Id"><i class="bi bi-eye"></i> View</a></td>
+                        <td class="text-end">
+                            <div class="d-inline-flex flex-wrap gap-1 justify-content-end">
+                                <a class="btn btn-outline-primary btn-sm" asp-action="Details" asp-route-id="@invoice.Id"><i class="bi bi-eye"></i> View</a>
+                                <a class="btn btn-outline-secondary btn-sm" asp-action="Print" asp-route-id="@invoice.Id"><i class="bi bi-printer"></i> Print Tax Invoice</a>
+                            </div>
+                        </td>
                     </tr>
                 }
             </tbody>
